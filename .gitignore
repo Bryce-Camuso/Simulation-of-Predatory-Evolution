@@ -1,2 +1,3 @@
 *.bat
 documents/*
+__pycache__

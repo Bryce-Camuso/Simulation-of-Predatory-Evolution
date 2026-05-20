@@ -73,7 +73,7 @@ class Scent:
         # for i in range(0,20):
         #     x = str(i * 5 + 5) + '%'
         #     self._scentPercentLookup.update({x:i})
-        self._scentPercentCoordinateLookup = [set() for i in range(0,20)] #remove fill for testing
+        self._scentPercentCoordinateLookup = [set() for i in range(0,20)] 
 
     def _get_stat_to_index(self, senseStat):
         #added if to prevent negative values
@@ -82,7 +82,7 @@ class Scent:
         return ((100 - senseStat)//5)- 1
     
     def _get_percent_to_index(self, percent):
-        # remove %
+        # removes %
         numConvertion = int(percent[:-1])
         #Added if to prevent negative values
         if numConvertion < 5:
