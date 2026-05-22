@@ -88,8 +88,69 @@ class Scent:
         if numConvertion < 5:
             numConvertion = 5
         return numConvertion // 5 -1
+    
+    def _get_stealth_percent(self, level, stealthStat):
+        return 100 - (level * 25) - ((stealthStat // 10) * 5)
 
-    def _update_scent_trail(self, scentPercent, scentCord):
+    def _get_stealth_percent_string(self, level, stealthStat):
+        return str(self._get_stealth_percent(level, stealthStat)) + '%'
+    
+    def _scent_search_top(self, position, level, stealthStat):
+        #adds current position to array. Recursively searchs positions above itself.
+        if level > 3 or (position[0] < 0 or position[1] < 0) or self._get_stealth_percent(level, stealthStat) <= 0:
+            return []
+
+        returnArray = [(self._get_stealth_percent_string(level, stealthStat), position)]
+        returnArray.extend(self._scent_search_top((position[0], position[1] + 1), level + 1, stealthStat))
+        return returnArray
+    
+    def _scent_search_right(self, position, level, stealthStat):
+        #adds current position to array. Recursively searchs positions above, to it's right, and under itself.
+        if level > 3 or (position[0] < 0 or position[1] < 0) or self._get_stealth_percent(level, stealthStat) <= 0:
+            return []
+
+        returnArray = [(self._get_stealth_percent_string(level, stealthStat), position)]
+        returnArray.extend(self._scent_search_top((position[0], position[1] + 1), level + 1, stealthStat))
+        returnArray.extend(self._scent_search_right((position[0] + 1, position[1]), level + 1, stealthStat))
+        returnArray.extend(self._scent_search_bottom((position[0], position[1] - 1), level + 1, stealthStat))
+        return returnArray
+    
+    def _scent_search_bottom(self, position, level, stealthStat):
+        #adds current position to array. Recursively searchs positions under itself.
+        if level > 3 or (position[0] < 0 or position[1] < 0) or self._get_stealth_percent(level, stealthStat) <= 0:
+            return []
+
+        returnArray = [(self._get_stealth_percent_string(level, stealthStat), position)]
+        returnArray.extend(self._scent_search_bottom((position[0], position[1] - 1), level + 1, stealthStat))
+
+        return returnArray
+
+    def _scent_search_left(self, position, level, stealthStat):
+        #adds current position to array. Recursively searchs positions above, to it's left, and under itself.
+        if level > 3 or (position[0] < 0 or position[1] < 0) or self._get_stealth_percent(level, stealthStat) <= 0:
+            return []
+
+        returnArray = [(self._get_stealth_percent_string(level, stealthStat), position)]
+        returnArray.extend(self._scent_search_top((position[0], position[1] + 1), level + 1, stealthStat))
+        returnArray.extend(self._scent_search_left((position[0] - 1, position[1]), level + 1, stealthStat))
+        returnArray.extend(self._scent_search_bottom((position[0], position[1] - 1), level + 1, stealthStat))
+
+        return returnArray
+    
+
+    def _scent_search(self, position, stealthStat):
+        returnArray = []
+        returnArray.append((self._get_stealth_percent_string(0, stealthStat), position))
+
+        #step 2) grab 4 adjacent neighbours as level 1 scent and then recursively find next 2 levels ending at level 3
+        returnArray.extend(self._scent_search_top((position[0], position[1] + 1), 1, stealthStat))
+        returnArray.extend(self._scent_search_right((position[0] + 1, position[1]), 1, stealthStat))
+        returnArray.extend(self._scent_search_bottom((position[0], position[1] - 1), 1, stealthStat))
+        returnArray.extend(self._scent_search_left((position[0] - 1, position[1]), 1, stealthStat))
+
+        return returnArray
+
+    def _update_scent_vars(self, scentPercent, scentCord):
         self._coordinateLookup.update({scentCord: scentPercent})
         self._scentPercentCoordinateLookup[scentPercent].update({scentCord})
 
@@ -107,12 +168,20 @@ class Scent:
                 
                 if currentScentLevel < scentPercent:
                     self._scentPercentCoordinateLookup[currentScentLevel].remove(scentCord)
-                    self._update_scent_trail(scentPercent, scentCord)
+                    self._update_scent_vars(scentPercent, scentCord)
 
             else:
-                self._update_scent_trail(scentPercent, scentCord)
+                self._update_scent_vars(scentPercent, scentCord)
         
-            
+
+    def update_scent_trail(self, position, stealthStat):
+        scentTrail = []
+        
+        # step 1) grab position lable as level 0 scent
+        scentTrail.extend(self._scent_search(position, stealthStat))
+        
+        self.add_scent_trail(scentTrail)
+
     
     def scent_decay(self):
         #shift array left by 1 index
@@ -155,6 +224,8 @@ def tester():
     # print(tester1._scentPercentCoordinateLookup)
     # print(tester1._coordinateLookup)
 
+    tester1.update_scent_trail((50,50), 30)
+    print(tester1._scentPercentCoordinateLookup)
 
 
 if __name__ == '__main__':
