@@ -87,7 +87,7 @@ class Scent:
         #Added if to prevent negative values
         if numConvertion < 5:
             numConvertion = 5
-        return numConvertion // 5 -1
+        return numConvertion // 5 - 1
     
     def _get_stealth_percent(self, level, stealthStat):
         return 100 - (level * 25) - ((stealthStat // 10) * 5)
@@ -154,6 +154,8 @@ class Scent:
         self._coordinateLookup.update({scentCord: scentPercent})
         self._scentPercentCoordinateLookup[scentPercent].update({scentCord})
 
+    
+    # Methods
     def get_scent_trail(self, senseStat):
         return self._scentPercentCoordinateLookup[self._get_stat_to_index(senseStat):]
     
@@ -197,35 +199,244 @@ class Scent:
 
 def tester():
     tester1 = Scent()
-    #print(tester1.get_scent_trail(50))
+    tester2 = Scent()
+    tester3 = Scent()
 
-    # add scent Tester
-    # print(tester1._scentPercentCoordinateLookup)
-    # tester1.add_scent_trail([('55%',(1,3)), ('50%',(2,3)), ('5%',(4,3)), ('5%',(5,3)), ('5%',(5,4))])
-    # print(tester1._scentPercentCoordinateLookup)
-    # print(tester1._coordinateLookup)
+    print('\nGet scent trail')
+    if len(tester1.get_scent_trail(0)) == 1:
+        print('Scence 0: pass')
+    else:
+        print('Scence 0: fail')
 
-    # print('------------------')
-    # tester1.add_scent_trail([('10%',(5,4)), ('45%',(4,3))])
-    # print(tester1._scentPercentCoordinateLookup)
-    # print(tester1._coordinateLookup)
+    if len(tester1.get_scent_trail(5)) == 2:
+        print('Scence 5: pass')
+    else:
+        print('Scence 5: fail')
+    
+    if len(tester1.get_scent_trail(10)) == 3:
+        print('Scence 10: pass')
+    else:
+        print('Scence 10: fail')
+    
+    if len(tester1.get_scent_trail(15)) == 4:
+        print('Scence 15: pass')
+    else:
+        print('Scence 15: fail')
+    
+    if len(tester1.get_scent_trail(20)) == 5:
+        print('Scence 20: pass')
+    else:
+        print('Scence 20: fail')
 
-    # print('------------------')
-    # tester1.add_scent_trail([('5%',(5,4)), ('30%',(4,3))])
-    # print(tester1._scentPercentCoordinateLookup)
-    # print(tester1._coordinateLookup)
+    if len(tester1.get_scent_trail(25)) == 6:
+        print('Scence 25: pass')
+    else:
+        print('Scence 25: fail')
 
-    # print(tester1.get_scent_trail(60))
+    if len(tester1.get_scent_trail(30)) == 7:
+        print('Scence 30: pass')
+    else:
+        print('Scence 30: fail')
 
-    # print('------------------')
-    # print(tester1._scentPercentCoordinateLookup)
-    # print(tester1._coordinateLookup)
-    # tester1.scent_decay()
-    # print(tester1._scentPercentCoordinateLookup)
-    # print(tester1._coordinateLookup)
+    if len(tester1.get_scent_trail(35)) == 8:
+        print('Scence 35: pass')
+    else:
+        print('Scence 35: fail')
+    
+    if len(tester1.get_scent_trail(40)) == 9:
+        print('Scence 40: pass')
+    else:
+        print('Scence 40: fail')
 
-    tester1.update_scent_trail((50,50), 30)
-    print(tester1._scentPercentCoordinateLookup)
+    if len(tester1.get_scent_trail(45)) == 10:
+        print('Scence 45: pass')
+    else:
+        print('Scence 45: fail')
+
+    if len(tester1.get_scent_trail(50)) == 11:
+        print('Scence 50: pass')
+    else:
+        print('Scence 50: fail')
+
+    if len(tester1.get_scent_trail(55)) == 12:
+        print('Scence 55: pass')
+    else:
+        print('Scence 55: fail')
+    
+    if len(tester1.get_scent_trail(60)) == 13:
+        print('Scence 60: pass')
+    else:
+        print('Scence 60: fail')
+    
+    if len(tester1.get_scent_trail(65)) == 14:
+        print('Scence 65: pass')
+    else:
+        print('Scence 65: fail')
+
+    if len(tester1.get_scent_trail(70)) == 15:
+        print('Scence 70: pass')
+    else:
+        print('Scence 70: fail')
+
+    if len(tester1.get_scent_trail(75)) == 16:
+        print('Scence 75: pass')
+    else:
+        print('Scence 75: fail')
+
+    if len(tester1.get_scent_trail(80)) == 17:
+        print('Scence 80: pass')
+    else:
+        print('Scence 80: fail')
+
+    if len(tester1.get_scent_trail(85)) == 18:
+        print('Scence 85: pass')
+    else:
+        print('Scence 85: fail')
+
+    if len(tester1.get_scent_trail(90)) == 19:
+        print('Scence 90: pass')
+    else:
+        print('Scence 90: fail')
+
+    if len(tester1.get_scent_trail(95)) == 20:
+        print('Scence 95: pass')
+    else:
+        print('Scence 95: fail')
+
+    if len(tester1.get_scent_trail(100)) == 20:
+        print('Scence 100: pass')
+    else:
+        print('Scence 100: fail')
+
+    print('---------------------------------------------------------------------------------------------------------------------')
+
+    print('\nAdd scent trail')
+    tester1.add_scent_trail([('5%', (0,0))])
+    exampleArray = [set() for i in range(0,20)]
+    exampleArray[0].update({(0,0)})
+    testFlag = True
+    testScent = tester1.get_scent_trail(100)
+    for i in range(len(exampleArray)):
+        if testScent[i] - exampleArray[i] != set():
+            testFlag = False
+
+    if testFlag:
+        print('Add scent 5%: pass')
+    else:
+        print('Add scent 5%: false')
+
+    tester1.add_scent_trail([('10%', (0,1)), ('15%', (0,2)), ('20%', (0,3)), ('25%', (0,4)), ('30%', (0,5)), ('35%', (0,6)), ('40%', (0,7)), ('45%', (0,8)), ('50%', (0,9)), ('55%', (0,10)), ('60%', (0,11)), ('65%', (0,12)), ('70%', (0,13)), ('75%', (0,14)), ('80%', (0,15)), ('85%', (0,16)), ('90%', (0,17)), ('95%', (0,18)), ('100%', (0,19))])
+    exampleArray = [{(0,i)} for i in range(0,20)]
+    testFlag = True
+    testScent = tester1.get_scent_trail(100)
+    for i in range(len(exampleArray)):
+        if exampleArray[i] - testScent[i]  != set():
+            testFlag = False
+
+    if testFlag:
+        print('Add scent full: pass')
+    else:
+        print('Add scent full: fail')
+    print('---------------------------------------------------------------------------------------------------------------------')
+
+    print('\nUpdate scent trail')
+    tester2.update_scent_trail((30,30),0)
+
+    exampleArray = [set() for i in range(0,20)]
+    exampleArray[19].update({(30,30)})
+    exampleArray[14].update({(31,30), (30,31), (29,30), (30,29)})
+    exampleArray[9].update({(31, 29), (28, 30), (30, 28), (32, 30), (29, 31), (29, 29), (30, 32), (31, 31)})
+    exampleArray[4].update({(32, 31), (30, 27), (30, 33), (27, 30), (28, 29), (31, 32), (29, 32), (29, 28), (32, 29), (28, 31), (31, 28), (33, 30)})
+    testFlag = True
+    testScent = tester2.get_scent_trail(100)
+    for i in range(len(exampleArray)):
+        if exampleArray[i] - testScent[i]  != set():
+            testFlag = False
+
+    if testFlag:
+        print('Update scent trail: pass')
+    else:
+        print('Update scent trail: fail')
+
+    print('---------------------------------------------------------------------------------------------------------------------')
+
+    print('\nScent decay')
+
+    tester3.update_scent_trail((30,30),100)
+    exampleArray = tester3.get_scent_trail(100)
+
+    tester3.scent_decay()
+    exampleArray.pop(0)
+    exampleArray.append(set())
+    testFlag = True
+    testScent = tester3.get_scent_trail(100)
+
+    for i in range(len(exampleArray)):
+        if exampleArray[i] - testScent[i] != set():
+            testFlag = False
+
+    if testFlag:
+        print('Scent decay 1: pass')
+    else:
+        print('Scent decay 1: false')
+        
+    tester3.scent_decay()
+    exampleArray.pop(0)
+    exampleArray.append(set())
+    testFlag = True
+    testScent = tester3.get_scent_trail(100)
+    for i in range(len(exampleArray)):
+        if exampleArray[i] - testScent[i]  != set():
+            testFlag = False
+    
+    if testFlag:
+        print('Scent decay 2: pass')
+    else:
+        print('Scent decay 2: false')
+
+    tester3.scent_decay()
+    exampleArray.pop(0)
+    exampleArray.append(set())
+    testFlag = True
+    testScent = tester3.get_scent_trail(100)
+    for i in range(len(exampleArray)):
+        if exampleArray[i] - testScent[i] != set():
+            testFlag = False
+    
+    if testFlag:
+        print('Scent decay 3: pass')
+    else:
+        print('Scent decay 3: false')
+
+    tester3.scent_decay()
+    exampleArray.pop(0)
+    exampleArray.append(set())
+    testFlag = True
+    testScent = tester3.get_scent_trail(100)
+    for i in range(len(exampleArray)):
+        if exampleArray[i] - testScent[i] != set():
+            testFlag = False
+    
+    if testFlag:
+        print('Scent decay 4: pass')
+    else:
+        print('Scent decay 4: false')
+
+    tester3.scent_decay()
+    exampleArray.pop(0)
+    exampleArray.append(set())
+    testFlag = True
+    testScent = tester3.get_scent_trail(100)
+    for i in range(len(exampleArray)):
+        if exampleArray[i] - testScent[i] != set():
+            testFlag = False
+
+    if testFlag:
+        print('Scent decay 5: pass')
+    else:
+        print('Scent decay 5: false')
+    
+
 
 
 if __name__ == '__main__':
