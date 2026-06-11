@@ -1,5 +1,6 @@
 from Scent import Scent
-import sys
+import heapq
+import math
 class Animal:
 
     def __init__(self, speed, stealth, stamina, sense, position):
@@ -148,6 +149,13 @@ class Animal:
         returnArray.extend(self._search_bottom((position[0], position[1] - 1), level + 1,  endLevel))
 
         return returnArray
+    
+    def _cellWeight(self, point, map):
+        checkMap = map.get_map_point(point)
+        if checkMap[1] == 1:
+            return 1
+        elif checkMap[1] == 3:
+            return 2
         
 
     # Methods
@@ -172,221 +180,75 @@ class Animal:
         returnArray.extend(self._search_left((position[0] - 1, position[1]), 1, endLevel))
         return returnArray
 
-    # def scent_search(self, scentObj):
-    #     '''
-    #     look at if this should go in this obj or children of obj
-    #     '''
-
-    #     #step 1 get possable scents from scent obj
-    #     #step 2 if possible filter list to reduce iterations
-    #     #step 3 get scense range and use search on the range. (scence gets converted to endLevel using the equation = math.floor(10 * math.log(scence) + 4)).
-    #     #step 4 look through scentTrail from scent obj and scense range to find matches.
-    #     pass
-    
     def scent_decay(self):
         self._scent.scent_decay()
-    
 
 
+    def pathfinding(self, targetTile, map):
+        speedToTiles = round(5*math.log(self.get_speed()/2)+5)
+        position = self.get_position()
 
-#manual tester -------------------------------------------------------------------------------------------------------------------------------------
-def manual_tester():
-    test1 = Animal(20,20,20,20,(10,10))
-    test2 = Animal(25,25,25,25,(30,30))
-    test3 = Animal(100,100,100,100,(30,30))
-    scentObj = Scent()
-    #test set 1) getters and setters
-    #getters
-    print('Getters')
-    print('speed: 20 = ' + str(test1.get_speed()))
-    print('stealth: 20 = ' + str(test1.get_stealth()))
-    print('stamina: 20 = ' + str(test1.get_stamina()))
-    print('sense: 20 = ' + str(test1.get_speed()))
-    print('position: (10,10) = ' + str(test1.get_position()))
-    print('energy: 100 = ' + str(test1.get_energy()))
-    print('scent: ScentObj = ' + str(test1.get_scent()))
-
-    print('---------------------------------------------------------------------------------------------------------------------')
-
-    #setters
-    print('\nSetters')
-    test1.set_speed(50)
-    print('speed: 50 = ' + str(test1.get_speed()))
-    test1.set_stealth(50)
-    print('stealth: 50 = ' + str(test1.get_stealth()))
-    test1.set_stamina(50)
-    print('stamina: 50 = ' + str(test1.get_stamina()))
-    test1.set_sense(50)
-    print('sense: 50 = ' + str(test1.get_speed()))
-    test1.set_position((30,30))
-    print('position: (30,30) = ' + str(test1.get_position()))
-    test1.substract_energy(10)
-    print('energy: 90 = ' + str(test1.get_energy()))
-
-    print('---------------------------------------------------------------------------------------------------------------------')
-
-    #setters errors
-    print('\nSetters')
-    try:
-        test1.set_speed(0)
-    except Exception as e:
-        print('Error: Speed can not be set below 1 = ' + str(e))
-    
-    try:
-        test1.set_stealth(0)
-    except Exception as e:
-        print('Error: Stealth can not be set below 1 = ' + str(e))
-
-    try:
-        test1.set_stamina(0)
-    except Exception as e:
-        print('Error: Stamina can not be set below 1 = ' + str(e))
-
-    try:
-        test1.set_sense(0)
-    except Exception as e:
-        print('Error: Sense can not be set below 1 = ' + str(e))
-    
-    try:
-        test1.set_position(0)
-    except Exception as e:
-        print('Error: Position must be a tuple = ' + str(e))
-    
-    try:
-        test1.set_position((-1,0))
-    except Exception as e:
-        print('Error: Position can not contain a negative value in the x or y plain = ' + str(e))
-
-    try:
-        test1.set_position((0,-1))
-    except Exception as e:
-        print('Error: Position can not contain a negative value in the x or y plain = ' + str(e))
-    
-    try:
-        test1.substract_energy(-1)
-    except Exception as e:
-        print('Error: Substract Energy can not subtract a negative value = ' + str(e))
+        #A* pathfinding https://www.geeksforgeeks.org/dsa/a-search-algorithm/
         
-    print('---------------------------------------------------------------------------------------------------------------------')
-
-    #setters valid edge cases
-    print('\nSetters valid edge cases')
-    test1.set_speed(1)
-    print('speed: 1 = ' + str(test1.get_speed()))
-    test1.set_stealth(1)
-    print('stealth: 1 = ' + str(test1.get_stealth()))
-    test1.set_stamina(1)
-    print('stamina: 1 = ' + str(test1.get_stamina()))
-    test1.set_sense(1)
-    print('sense: 1 = ' + str(test1.get_speed()))
-    test1.set_position((0,0))
-    print('position: (0,0) = ' + str(test1.get_position()))
-    test1.substract_energy(0)
-    print('energy: 90 = ' + str(test1.get_energy()))
+        queue = []
+        queueList = {position: 0}
+        heapq.heappush(queue, (0 ,position))
+        searched_list = {position}
+        paths = {}
+        foundFlag = False
 
 
-    print('---------------------------------------------------------------------------------------------------------------------')
-    input()
-    #test set 2) methods
-    print('\nUpdate Scent Trail')
-    print('Scent trail: ' + str(scentObj.get_scent_trail(100)) + ' = ' + str(test1.get_scent().get_scent_trail(100)))
-    print('\nstealth = 50 [-25% per level]')
-    test1.update_scent_trail()
-    scentObj.update_scent_trail((30,30), 50)
-    print('Scent trail: \n' + str(scentObj.get_scent_trail(100)) + ' = \n' + str(test1.get_scent().get_scent_trail(100)))
+        while len(queue) > 0 and foundFlag == False:
+            p = heapq.heappop(queue)
+            searched_list.add(p[1])
+            directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+            for dir in directions:
+                new_pos = (p[1][0] + dir[0], p[1][1] + dir[1])
+                if map.get_map_point(new_pos)[1] != 2 and new_pos not in searched_list:
+                    if new_pos == targetTile:
+                        g = self._cellWeight(new_pos, map)
+                        h = abs(new_pos[0] - targetTile[0]) + abs(new_pos[1] - targetTile[1])
+                        f = g + h
+                        searched_list.add(new_pos)
+                        paths.update({new_pos: p })
+                        foundFlag = True
+                    else:
+                        g = self._cellWeight(new_pos, map)
+                        h = abs(new_pos[0] - targetTile[0]) + abs(new_pos[1] - targetTile[1])
+                        f = g + h
+                        if new_pos in queueList:
+                            if queueList[new_pos] > f:
+                                paths.update({new_pos: (g, p[1]) })
+                                queue.remove(new_pos)
+                                heapq.heappush(queue, (f,new_pos))
+                                queueList[new_pos] = f
+                        else:
+                            paths.update({new_pos: (g, p[1]) })
+                            heapq.heappush(queue, (f,new_pos))
+                            queueList.update({new_pos: f}) 
 
-    print('\nChange position to (30,31) [test y movement]')
-    test1.set_position((30,31))
-    test1.update_scent_trail()
-    scentObj.update_scent_trail((30,31), 50)
-    print('Scent trail: \n' + str(scentObj.get_scent_trail(100)) + ' = \n' + str(test1.get_scent().get_scent_trail(100)))
 
-    print('\nChange position to (31,30) [test x movement]')
-    test1.set_position((31,30))
-    test1.update_scent_trail()
-    scentObj.update_scent_trail((31,30), 50)
-    print('Scent trail: \n' + str(scentObj.get_scent_trail(100)) + ' = \n' + str(test1.get_scent().get_scent_trail(100)))
-
-    print('---------------------------------------------------------------------------------------------------------------------')
-    input()
-
-    print('\nstealth = 25 [-10% per level]')
-    scentObj = Scent()
-
-    print('Scent trail: ' + str(scentObj.get_scent_trail(100)) + ' = ' + str(test2.get_scent().get_scent_trail(100)))
-    test2.update_scent_trail()
-    scentObj.update_scent_trail((30,30), 25)
-    print('Scent trail: \n' + str(scentObj.get_scent_trail(100)) + ' = \n' + str(test2.get_scent().get_scent_trail(100)))
-
-    print('\nChange position to (30,31) [test y movement]')
-    test2.set_position((30,31))
-    test2.update_scent_trail()
-    scentObj.update_scent_trail((30,31), 25)
-    print('Scent trail: \n' + str(scentObj.get_scent_trail(100)) + ' = \n' + str(test2.get_scent().get_scent_trail(100)))
-
-    print('\nChange position to (31,30) [test x movement]')
-    test2.set_position((31,30))
-    test2.update_scent_trail()
-    scentObj.update_scent_trail((31,30), 25)
-    print('Scent trail: \n' + str(scentObj.get_scent_trail(100)) + ' = \n' + str(test2.get_scent().get_scent_trail(100)))
-
-    print('---------------------------------------------------------------------------------------------------------------------')
-    input()
-
-    print('\nstealth = 100 [-50% per level]')
-    scentObj = Scent()
-
-    print('Scent trail: ' + str(scentObj.get_scent_trail(100)) + ' = ' + str(test3.get_scent().get_scent_trail(100)))
-    test3.update_scent_trail()
-    scentObj.update_scent_trail((30,30), 100)
-    print('Scent trail: \n' + str(scentObj.get_scent_trail(100)) + ' = \n' + str(test3.get_scent().get_scent_trail(100)))
-
-    print('\nChange position to (30,31) [test y movement]')
-    test3.set_position((30,31))
-    test3.update_scent_trail()
-    scentObj.update_scent_trail((30,31), 100)
-    print('Scent trail: \n' + str(scentObj.get_scent_trail(100)) + ' = \n' + str(test3.get_scent().get_scent_trail(100)))
-
-    print('\nChange position to (31,30) [test x movement]')
-    test3.set_position((31,30))
-    test3.update_scent_trail()
-    scentObj.update_scent_trail((31,30), 100)
-    print('Scent trail: \n' + str(scentObj.get_scent_trail(100)) + ' = \n' + str(test3.get_scent().get_scent_trail(100)))
-
-    print('---------------------------------------------------------------------------------------------------------------------')
-    input()
-
-    print('\nSearch')
-    print('Sense = 2 ')
-    scense = 2
-
-    print(test1.search(scense))
-
-    print('---------------------------------------------------------------------------------------------------------------------')
-    input()
-
-    print('\nScent Decay')
-    print('Scent decay 0: \n' + str(scentObj.get_scent_trail(100)) + ' = \n' + str(test3.get_scent().get_scent_trail(100)))
-    test3.scent_decay()
-    scentObj.scent_decay()
-    print('Scent decay 1: \n' + str(scentObj.get_scent_trail(100)) + ' = \n' + str(test3.get_scent().get_scent_trail(100)))
-    test3.scent_decay()
-    scentObj.scent_decay()
-    print('Scent decay 2: \n' + str(scentObj.get_scent_trail(100)) + ' = \n' + str(test3.get_scent().get_scent_trail(100)))
-    test3.scent_decay()
-    scentObj.scent_decay()
-    print('Scent decay 3: \n' + str(scentObj.get_scent_trail(100)) + ' = \n' + str(test3.get_scent().get_scent_trail(100)))
-    test3.scent_decay()
-    scentObj.scent_decay()
-    print('Scent decay 4: \n' + str(scentObj.get_scent_trail(100)) + ' = \n' + str(test3.get_scent().get_scent_trail(100)))
-    test3.scent_decay()
-    scentObj.scent_decay()
-    print('Scent decay 5: \n' + str(scentObj.get_scent_trail(100)) + ' = \n' + str(test3.get_scent().get_scent_trail(100)))
-
+        currentNode = (g, targetTile)
+        fullPath = [currentNode]
+        while True:
+            if currentNode[1] in paths:
+                currentNode = paths[currentNode[1]]
+                fullPath.append(currentNode)
+            else: break
+        fullPath.reverse()
+        sum = 0
+        for i in range(len(fullPath)):
+            sum = fullPath[i][0] + sum
+            if sum > speedToTiles:
+                return fullPath[:i]
+            else:
+                fullPath[i] = (sum, fullPath[i][1])
+        return fullPath
+    
 
 
 #self tester ------------------------------------------------------------------------------------------------------------------------------------------
-def auto_tester():
+def tester():
     test1 = Animal(20,20,20,20,(10,10))
     test2 = Animal(25,25,25,25,(30,30))
     test3 = Animal(100,100,100,100,(30,30))
@@ -840,8 +702,4 @@ def auto_tester():
 
 
 if __name__ == '__main__':
-    testerType = sys.argv[1]
-    if testerType.lower() == 'manual':
-        manual_tester()
-    elif testerType.lower() == 'auto':
-        auto_tester()
+        tester()

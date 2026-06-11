@@ -56,10 +56,21 @@ class Map:
         '''
         returnArray = []
         for point in pointList:
-            #error checking
-            returnArray.append((point,self._map[point[0]][point[1]]))
+            if point[0] > self._MAPSCALE or point[1] > self._MAPSCALE:
+                pass
+            else:
+                returnArray.append((point,self._map[point[0]][point[1]]))
         
         return returnArray
+    
+    def get_map_point(self, point):
+        '''
+        expects point as a tuple in the form (x,y)
+        '''
+        if point[0] > self._MAPSCALE or point[1] > self._MAPSCALE:
+                pass
+        else:
+            return (point,self._map[point[0]][point[1]])
 
 
 
@@ -153,6 +164,13 @@ def tester():
         print('Map Get List: pass')
     else:
         print('Map Get List: fail')
+
+    testSample = map1.get_map_point((5,5))
+
+    if testSample[0] == (5,5):
+        print('Map Get point: pass')
+    else:
+        print('Map Get point: fail')
 
     print('---------------------------------------------------------------------------------------------------------------------')
     print('Map Singleton test')
