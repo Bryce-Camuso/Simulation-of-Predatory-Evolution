@@ -33,10 +33,7 @@ To run any python script (denoted by a .py extention) in the project by useing t
 
 An example test is **python classes/Scent.py** to run the Scent class tester. 
 
-Optinal args will be specified below.
+## Simulation testing
 
-## Command line Arguments
+The simulation test is a test version of the implented systems to show the basics of the system in action. This simulation consistes of one predator, one prey, and one plant all implented using the Animal class. This shows that the predator can track the prey as it moves and the that the prey can track the plant.
 
-| File      | Arguments      |
-| --------- | -------------- |
-| Animal.py | manual \| auto |

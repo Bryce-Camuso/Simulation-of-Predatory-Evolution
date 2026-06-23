@@ -163,9 +163,6 @@ class Animal:
         #returns a number from the calcualtion made in the milestone 4
         pass
 
-    def pathfinding(self):
-        #milestone 4
-        pass
 
     def update_scent_trail(self):
         self._scent.update_scent_trail(self.get_position(), self.get_stealth())
