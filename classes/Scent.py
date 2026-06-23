@@ -69,10 +69,6 @@ class Scent:
         95 = 0
         '''
         self._coordinateLookup = {}
-        # self._scentPercentLookup = {}
-        # for i in range(0,20):
-        #     x = str(i * 5 + 5) + '%'
-        #     self._scentPercentLookup.update({x:i})
         self._scentPercentCoordinateLookup = [set() for i in range(0,20)] 
 
     def _get_stat_to_index(self, senseStat):
