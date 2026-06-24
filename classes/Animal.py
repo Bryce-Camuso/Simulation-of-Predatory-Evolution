@@ -1,4 +1,5 @@
 from Scent import Scent
+from Map import Map
 import heapq
 import math
 class Animal:
@@ -31,7 +32,7 @@ class Animal:
 
         
         '''
-        self._ENERGYTOTAL = 100
+        self._ENERGYTOTAL = 10000
         self._speed = speed
         self._stealth = stealth
         self._stamina = stamina
@@ -102,53 +103,6 @@ class Animal:
 
 
     # Helper functions
-    # def _get_stealth_percent(self, level):
-    #     return 100 - (level * 25) - ((self.get_stealth() // 10) * 5)
-    
-    # def _get_stealth_percent_string(self, level):
-    #     return str(self._get_stealth_percent(level)) + '%'
-
-    def _search_top(self, position, level, endLevel):
-        #adds current position to array. Recursively searchs positions above it
-        if level > endLevel or (position[0] < 0 or position[1] < 0):
-            return []
-
-        returnArray = [position]
-        returnArray.extend(self._search_top((position[0], position[1] + 1), level + 1, endLevel))
-        return returnArray
-
-    def _search_right(self, position, level, endLevel):
-        #adds current position to array. Recursively searchs positions above, to it's right, and under it
-        if level > endLevel or (position[0] < 0 or position[1] < 0):
-            return []
-
-        returnArray = [position]
-        returnArray.extend(self._search_top((position[0], position[1] + 1), level + 1,  endLevel))
-        returnArray.extend(self._search_right((position[0] + 1, position[1]), level + 1,  endLevel))
-        returnArray.extend(self._search_bottom((position[0], position[1] - 1), level + 1,  endLevel))
-        return returnArray
-
-    def _search_bottom(self, position, level, endLevel):
-        #adds current position to array. Recursively searchs positions under it
-        if level > endLevel or (position[0] < 0 or position[1] < 0):
-            return []
-
-        returnArray = [position]
-        returnArray.extend(self._search_bottom((position[0], position[1] - 1), level + 1,  endLevel))
-
-        return returnArray
-
-    def _search_left(self, position, level, endLevel):
-        #adds current position to array. Recursively searchs positions above, to it's left, and under it
-        if level > endLevel or (position[0] < 0 or position[1] < 0):
-            return []
-
-        returnArray = [position]
-        returnArray.extend(self._search_top((position[0], position[1] + 1), level + 1,  endLevel))
-        returnArray.extend(self._search_left((position[0] - 1, position[1]), level + 1,  endLevel))
-        returnArray.extend(self._search_bottom((position[0], position[1] - 1), level + 1,  endLevel))
-
-        return returnArray
     
     def _cellWeight(self, point, map):
         checkMap = map.get_map_point(point)
@@ -161,7 +115,12 @@ class Animal:
     # Methods
     def energy_used(self):
         #returns a number from the calcualtion made in the milestone 4
-        pass
+        speed = self.get_speed()
+        stamina = self.get_stamina()
+        stealth = self.get_stealth()
+        sense = self.get_sense()
+        energyCalculation = sense + ((speed * 2) - stamina) + (stealth * 2)
+        self.substract_energy(energyCalculation)
 
     def pathfinding(self):
         #milestone 4
@@ -170,15 +129,6 @@ class Animal:
     def update_scent_trail(self):
         self._scent.update_scent_trail(self.get_position(), self.get_stealth())
 
-    def search(self, endLevel):
-        #add in negative check
-        position = self.get_position()
-        returnArray = []
-        returnArray.extend(self._search_top((position[0], position[1] + 1), 1, endLevel))
-        returnArray.extend(self._search_right((position[0] + 1, position[1]), 1, endLevel))
-        returnArray.extend(self._search_bottom((position[0], position[1] - 1), 1, endLevel))
-        returnArray.extend(self._search_left((position[0] - 1, position[1]), 1, endLevel))
-        return returnArray
 
     def scent_decay(self):
         self._scent.scent_decay()
@@ -281,7 +231,7 @@ def tester():
     else:
         print('position: fail')
 
-    if test1.get_energy() == 100:
+    if test1.get_energy() == 10000:
         print('energy: pass')
     else:
         print('energy: fail')
@@ -327,7 +277,7 @@ def tester():
     else:
         print('position: fail')
     test1.substract_energy(10)
-    if test1.get_energy() == 90:
+    if test1.get_energy() == 9990:
         print('energy: pass')
     else:
         print('energy: fail')
@@ -434,7 +384,7 @@ def tester():
     else:
         print('position: fail')
     test1.substract_energy(0)
-    if test1.get_energy() == 90:
+    if test1.get_energy() == 9990:
         print('energy: pass')
     else:
         print('energy: fail')
@@ -600,23 +550,6 @@ def tester():
         print('Update check: pass')
     else:
         print('Update check: false')
-
-    print('---------------------------------------------------------------------------------------------------------------------')
-
-    print('\nSearch')
-    print('Sense = 2 ')
-
-    testSearchArray = test1.search(2)
-    exampleSearchArray = [(31, 31), (31, 32), (32, 30), (32, 31), (33, 30), (32, 29), (31, 29), (31, 28), (30, 30), (30, 31), (29, 30), (30, 29)]
-    testFlag = True
-    for i in range(len(exampleSearchArray)):
-        if testSearchArray[i] is exampleSearchArray[i] != set():
-            testFlag = False
-
-    if testFlag:
-        print('Update check: pass')
-    else:
-        print('Update check: false')
     
     print('---------------------------------------------------------------------------------------------------------------------')
 
@@ -698,6 +631,38 @@ def tester():
     for i in range(len(exampleObj)):
         if exampleObj[i] - testScent[i] != set():
             testFlag = False
+
+    print('---------------------------------------------------------------------------------------------------------------------')
+
+    print('\nEnergy Use')
+    test4 = Animal(50,50,50,50,(50,50))
+
+    test4.energy_used()
+
+    if test4.get_energy() == 9800:
+        print('Energy use: pass')
+    else:
+        print('Energy use: false')
+
+
+
+
+    print('---------------------------------------------------------------------------------------------------------------------')
+
+    print('\nPathFinding')
+
+    testMap = Map()
+    testPoint = (45,45)
+    # quick test to make sure point is reachable
+    if testMap.get_map_point(testPoint)[1] != 2:
+        pass
+    else: testPoint = (55,55)
+
+    testArray = test4.pathfinding(testPoint,testMap)
+    if testArray[-1][1] == testPoint:
+        print('PathFinding: pass')
+    else:
+        print('PathFinding: false')
 
 
 
