@@ -103,6 +103,48 @@ class Animal:
 
 
     # Helper functions
+
+    def _search_top(self, position, level, endLevel):
+        #adds current position to array. Recursively searchs positions above it
+        if level > endLevel or (position[0] < 0 or position[1] < 0):
+            return []
+
+        returnArray = [position]
+        returnArray.extend(self._search_top((position[0], position[1] + 1), level + 1, endLevel))
+        return returnArray
+
+    def _search_right(self, position, level, endLevel):
+        #adds current position to array. Recursively searchs positions above, to it's right, and under it
+        if level > endLevel or (position[0] < 0 or position[1] < 0):
+            return []
+
+        returnArray = [position]
+        returnArray.extend(self._search_top((position[0], position[1] + 1), level + 1,  endLevel))
+        returnArray.extend(self._search_right((position[0] + 1, position[1]), level + 1,  endLevel))
+        returnArray.extend(self._search_bottom((position[0], position[1] - 1), level + 1,  endLevel))
+        return returnArray
+
+    def _search_bottom(self, position, level, endLevel):
+        #adds current position to array. Recursively searchs positions under it
+        if level > endLevel or (position[0] < 0 or position[1] < 0):
+            return []
+
+        returnArray = [position]
+        returnArray.extend(self._search_bottom((position[0], position[1] - 1), level + 1,  endLevel))
+
+        return returnArray
+
+    def _search_left(self, position, level, endLevel):
+        #adds current position to array. Recursively searchs positions above, to it's left, and under it
+        if level > endLevel or (position[0] < 0 or position[1] < 0):
+            return []
+
+        returnArray = [position]
+        returnArray.extend(self._search_top((position[0], position[1] + 1), level + 1,  endLevel))
+        returnArray.extend(self._search_left((position[0] - 1, position[1]), level + 1,  endLevel))
+        returnArray.extend(self._search_bottom((position[0], position[1] - 1), level + 1,  endLevel))
+
+        return returnArray
     
     def _cellWeight(self, point, map):
         checkMap = map.get_map_point(point)
@@ -113,6 +155,16 @@ class Animal:
         
 
     # Methods
+    def search(self, endLevel):
+        #add in negative check
+        position = self.get_position()
+        returnArray = []
+        returnArray.extend(self._search_top((position[0], position[1] + 1), 1, endLevel))
+        returnArray.extend(self._search_right((position[0] + 1, position[1]), 1, endLevel))
+        returnArray.extend(self._search_bottom((position[0], position[1] - 1), 1, endLevel))
+        returnArray.extend(self._search_left((position[0] - 1, position[1]), 1, endLevel))
+        return returnArray
+
     def energy_used(self):
         #returns a number from the calcualtion made in the milestone 4
         speed = self.get_speed()
@@ -282,7 +334,7 @@ def tester():
     print('---------------------------------------------------------------------------------------------------------------------')
 
     #setters errors
-    print('\nSetters')
+    print('\nSetters Errors')
     try:
         test1.set_speed(0)
         print('Error: None')
@@ -547,7 +599,27 @@ def tester():
         print('Update check: pass')
     else:
         print('Update check: false')
+
+
+
+
+    print('---------------------------------------------------------------------------------------------------------------------')
+
+    print('\nSearch')
+    print('endLevel = 2 ')
+
+    testSearchArray = test1.search(2)
+    exampleSearchArray = [(31, 31), (31, 32), (32, 30), (32, 31), (33, 30), (32, 29), (31, 29), (31, 28), (30, 30), (30, 31), (29, 30), (30, 29)]
+    testFlag = True
+    for i in range(len(exampleSearchArray)):
+        if testSearchArray[i] is exampleSearchArray[i] != set():
+            testFlag = False
     
+
+    if testFlag:
+        print('Search check: pass')
+    else:
+        print('Search check: false')
     print('---------------------------------------------------------------------------------------------------------------------')
 
     print('\nScent Decay')
