@@ -182,9 +182,9 @@ def tester():
     testSample2 = map2.get_map_list(testPoints)
 
     if testSample1 == testSample2:
-        print('Map ingleton: pass')
+        print('Map Singleton: pass')
     else:
-        print('Map ingleton: fail')
+        print('Map Singleton: fail')
 
 
     
