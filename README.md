@@ -14,26 +14,28 @@
 - Python 3.14.4
 - Python Sudo-Random Library (3.14.4)
 - Python Standard Math Library (3.14.4)
+- Python Heap queue algorithm Aka heapq (3.14.4)
 
 ## Getting Started
 
-To begin the running the project the user must have all dependcies listed above downloaded on their computer. 
+To begin running this project the user must have all dependencies listed above downloaded on their computer. 
 
-To download these dependencies go [python.org/downloads](https://www.python.org/downloads/) and find the version [3.14.4](https://www.python.org/downloads/release/python-3144/).
+To download these dependencies, go to [python.org/downloads](https://www.python.org/downloads/) and find the version [3.14.4](https://www.python.org/downloads/release/python-3144/).
 
-From their the chose the correct download option for your operating system, and go through the installation prosses.
+From there, choose the correct download option for your operating system, and go through the installation process.
 
-The following dependecies will be included in the download: Python Sudo-Random Library, and Python Math Library.
+The following dependencies will be included in the download: Python Sudo-Random Library, Python Math Library, and Python Heap queue algorithm.
 
-Once downloaded to confirm that python is working you can use the command **python** or **python --version**
+To confirm that python is downloaded and working correctly, you can use the command **python** or **python --version** in a terminal of your choice
 
 ## Running project files
 
-To run any python script (denoted by a .py extention) in the project by useing the command line to type the **python <filepath> [args]** and hit enter. The program file should run automaticly. 
+To run any python script (denoted by a .py extension) in the project, use the command line to type **python \<filepath\> [args]** and hit enter. The program file should run automatically. 
 
-An example test is **python classes/Scent.py** to run the Scent class tester. 
+e.g. **python classes/Scent.py** to run the Scent class tester. 
 
 ## Simulation testing
 
-The simulation test is a test version of the implented systems to show the basics of the system in action. This simulation consistes of one predator, one prey, and one plant all implented using the Animal class. This shows that the predator can track the prey as it moves and the that the prey can track the plant.
+The simulation test is a test version of the implanted systems to show the basics of the system in action. This simulation consists of one predator, one prey, and one plant all implemented using the Animal class. This shows that the predator can track the prey as it moves and that the prey can track the plant.
+
 

@@ -200,109 +200,109 @@ def tester():
 
     print('\nGet scent trail')
     if len(tester1.get_scent_trail(0)) == 1:
-        print('Scence 0: pass')
+        print('Sense  0: pass')
     else:
-        print('Scence 0: fail')
+        print('Sense  0: fail')
 
     if len(tester1.get_scent_trail(5)) == 2:
-        print('Scence 5: pass')
+        print('Sense  5: pass')
     else:
-        print('Scence 5: fail')
+        print('Sense  5: fail')
     
     if len(tester1.get_scent_trail(10)) == 3:
-        print('Scence 10: pass')
+        print('Sense  10: pass')
     else:
-        print('Scence 10: fail')
+        print('Sense  10: fail')
     
     if len(tester1.get_scent_trail(15)) == 4:
-        print('Scence 15: pass')
+        print('Sense  15: pass')
     else:
-        print('Scence 15: fail')
+        print('Sense  15: fail')
     
     if len(tester1.get_scent_trail(20)) == 5:
-        print('Scence 20: pass')
+        print('Sense  20: pass')
     else:
-        print('Scence 20: fail')
+        print('Sense  20: fail')
 
     if len(tester1.get_scent_trail(25)) == 6:
-        print('Scence 25: pass')
+        print('Sense  25: pass')
     else:
-        print('Scence 25: fail')
+        print('Sense  25: fail')
 
     if len(tester1.get_scent_trail(30)) == 7:
-        print('Scence 30: pass')
+        print('Sense  30: pass')
     else:
-        print('Scence 30: fail')
+        print('Sense  30: fail')
 
     if len(tester1.get_scent_trail(35)) == 8:
-        print('Scence 35: pass')
+        print('Sense  35: pass')
     else:
-        print('Scence 35: fail')
+        print('Sense  35: fail')
     
     if len(tester1.get_scent_trail(40)) == 9:
-        print('Scence 40: pass')
+        print('Sense  40: pass')
     else:
-        print('Scence 40: fail')
+        print('Sense  40: fail')
 
     if len(tester1.get_scent_trail(45)) == 10:
-        print('Scence 45: pass')
+        print('Sense  45: pass')
     else:
-        print('Scence 45: fail')
+        print('Sense  45: fail')
 
     if len(tester1.get_scent_trail(50)) == 11:
-        print('Scence 50: pass')
+        print('Sense  50: pass')
     else:
-        print('Scence 50: fail')
+        print('Sense  50: fail')
 
     if len(tester1.get_scent_trail(55)) == 12:
-        print('Scence 55: pass')
+        print('Sense  55: pass')
     else:
-        print('Scence 55: fail')
+        print('Sense  55: fail')
     
     if len(tester1.get_scent_trail(60)) == 13:
-        print('Scence 60: pass')
+        print('Sense  60: pass')
     else:
-        print('Scence 60: fail')
+        print('Sense  60: fail')
     
     if len(tester1.get_scent_trail(65)) == 14:
-        print('Scence 65: pass')
+        print('Sense  65: pass')
     else:
-        print('Scence 65: fail')
+        print('Sense  65: fail')
 
     if len(tester1.get_scent_trail(70)) == 15:
-        print('Scence 70: pass')
+        print('Sense  70: pass')
     else:
-        print('Scence 70: fail')
+        print('Sense  70: fail')
 
     if len(tester1.get_scent_trail(75)) == 16:
-        print('Scence 75: pass')
+        print('Sense  75: pass')
     else:
-        print('Scence 75: fail')
+        print('Sense  75: fail')
 
     if len(tester1.get_scent_trail(80)) == 17:
-        print('Scence 80: pass')
+        print('Sense  80: pass')
     else:
-        print('Scence 80: fail')
+        print('Sense  80: fail')
 
     if len(tester1.get_scent_trail(85)) == 18:
-        print('Scence 85: pass')
+        print('Sense  85: pass')
     else:
-        print('Scence 85: fail')
+        print('Sense  85: fail')
 
     if len(tester1.get_scent_trail(90)) == 19:
-        print('Scence 90: pass')
+        print('Sense  90: pass')
     else:
-        print('Scence 90: fail')
+        print('Sense  90: fail')
 
     if len(tester1.get_scent_trail(95)) == 20:
-        print('Scence 95: pass')
+        print('Sense  95: pass')
     else:
-        print('Scence 95: fail')
+        print('Sense  95: fail')
 
     if len(tester1.get_scent_trail(100)) == 20:
-        print('Scence 100: pass')
+        print('Sense  100: pass')
     else:
-        print('Scence 100: fail')
+        print('Sense  100: fail')
 
     print('---------------------------------------------------------------------------------------------------------------------')
 
