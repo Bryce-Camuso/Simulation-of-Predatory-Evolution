@@ -195,15 +195,21 @@ class Animal:
         searched_list = {position}
         paths = {}
         foundFlag = False
+        directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+        print('current posistion is: {}'.format(map.get_map_point(self.get_position())))
+        print('target is: {}'.format(map.get_map_point(targetTile)))
+        for dir in directions:
+            print(map.get_map_point((targetTile[0] - dir[0], targetTile[1] - dir[1])))
 
-
-        while len(queue) > 0 and foundFlag == False:
+        #print('Start Test')
+        while len(queue) > 0 and len(queue) < 200 and foundFlag == False:
             p = heapq.heappop(queue)
+            print(len(queue))
             searched_list.add(p[1])
             directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
             for dir in directions:
                 new_pos = (p[1][0] + dir[0], p[1][1] + dir[1])
-                if map.get_map_point(new_pos)[1] != 2 and new_pos not in searched_list:
+                if (new_pos[0] < map.get_map_limit() and new_pos[1] < map.get_map_limit()) and (new_pos[0] >= 0 and new_pos[1] >= 0) and map.get_map_point(new_pos)[1] != 2 and new_pos not in searched_list:
                     if new_pos == targetTile:
                         g = self._cellWeight(new_pos, map)
                         h = abs(new_pos[0] - targetTile[0]) + abs(new_pos[1] - targetTile[1])
@@ -225,8 +231,9 @@ class Animal:
                             paths.update({new_pos: (g, p[1]) })
                             heapq.heappush(queue, (f,new_pos))
                             queueList.update({new_pos: f}) 
-
-
+        #print('end test')
+        #print(g)
+        print(paths)
         currentNode = (g, targetTile)
         fullPath = [currentNode]
         while True:

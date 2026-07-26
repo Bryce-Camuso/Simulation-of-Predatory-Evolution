@@ -41,6 +41,9 @@ class Map:
 
         return self._instance
 
+    def get_map_limit(self):
+        return self._MAPSCALE
+
     def get_x(self, xRow):
         return self._map[xRow].copy()
     
@@ -81,6 +84,7 @@ class Map:
 def tester():
     map1 = Map()
 
+
     print('---------------------------------------------------------------------------------------------------------------------')
 
     print('Map Size test')
@@ -100,6 +104,11 @@ def tester():
         print('Map Size Y Scale: pass')
     else:
         print('Map Size Y Scale: fail')
+
+    if map1.get_map_limit() == map1._MAPSCALE:
+        print('Map limit: pass')
+    else:
+        print('Map limit: fail')
     
     print('---------------------------------------------------------------------------------------------------------------------')
     print('Map Tile Distribution test')

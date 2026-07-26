@@ -177,9 +177,8 @@ class Predator(Animal):
         if self.get_energy() >= 0:
             #potentily add a check for if how much enrgy is left to use and remove final points from list
             maxWeight = self._get_max_weight(prey, map, phase)
-            self.energy_used()
             return self.pathfinding(maxWeight[0], map)
-
+        else: return []
 
 
     def ambush_check(self, tile):
