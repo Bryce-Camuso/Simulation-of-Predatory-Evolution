@@ -10,12 +10,11 @@
 - **Student(s):** Bryce Camuso
 - **Course:** CISC 699
 - **Semester:** Summer 2026
-- **Repository URL:** To Be Completed
-- **Current Branch:** To Be Completed
-- **Current Commit SHA:** To Be Completed
+- **Repository URL:** [github](https://github.com/Bryce-Camuso/Simulation-of-Predatory-Evolution)
+- **Current Branch:** Master
 - **Current Release Version:** 0.1
-- **Document Version:** 0.2
-- **Last Updated:** 2026-07-21
+- **Document Version:** 0.3
+- **Last Updated:** 2026-07-25
 
 ---
 
@@ -23,8 +22,9 @@
 
 | Version | Date | Git Commit | Description | Author |
 |----------|------|------------|-------------|--------|
-| 0.1 | 2026-07-21 | To Be Completed | Initial PRD scaffold created from prompt structure. | To Be Completed |
-| 0.2 | 2026-07-21 | To Be Completed | Updated PRD based on repository evidence: predator-prey simulation with scent tracking, map-based navigation, and multiple animal types. | To Be Completed |
+| 0.1 | 2026-07-21 | test PRD | Initial PRD scaffold created from prompt structure. | Bryce Camuso |
+| 0.2 | 2026-07-21 | PRD update with prompts | Updated PRD based on repository evidence: predator-prey simulation with scent tracking, map-based navigation, and multiple animal types. | Bryce Camuso |
+| 0.3 | 2026-07-25 | PRD manual update | Updated PRD to better reflect the projects intentions that have not been reflected in code yet. | Bryce Camuso |
 
 ---
 
@@ -59,7 +59,7 @@
 
 ## Problem Statement
 
-Simulate predator-prey ecosystem dynamics in a bounded 2D environment with scent-based tracking and hierarchical animal behaviors. The system must accurately model movement, sensing, pursuit, evasion, and energy management for multiple species.
+Simulate predator-prey ecosystem dynamics in a bounded 2D environment with statistically weighted decision making and hierarchical animal behaviors. The system must accurately model movement, sensing, pursuit, evasion, and energy management for multiple species.
 
 ## Intended Users
 
@@ -70,13 +70,13 @@ Simulate predator-prey ecosystem dynamics in a bounded 2D environment with scent
 ## Stakeholders
 
 - CISC 699 Course Instructor
-- Student Developer(s)
+- Student Developer
 - Repository Maintainers
 
 ## Product Goals
 
 - Implement a working predator-prey simulation with multiple animal types
-- Demonstrate scent-trail tracking and decay mechanics
+- Demonstrate statistically weighted decision making
 - Support configurable animal attributes (speed, stealth, stamina, sense, position, energy)
 - Generate CSV output for simulation results analysis
 - Provide unit test coverage for all major components
@@ -84,9 +84,9 @@ Simulate predator-prey ecosystem dynamics in a bounded 2D environment with scent
 ## Major Features
 
 - **Animal Class Hierarchy:** Base Animal class with specialized subclasses (Predator, Prey, Bird, Rabbit, Mouse)
-- **Map-Based Navigation:** Configurable grid-based environment with tile distribution (Plain, Tree, Bush)
+- **Map-Based Navigation:** Random grid-based environment with tile distribution (Plain, Tree, Bush)
 - **Scent System:** Dynamic scent trail generation, distribution, and decay over time
-- **Search Behaviors:** Multiple predator search strategies (Search, Stalking, Pursuit)
+- **Search Behaviors:** Two predator hunting strategies (Pursuit & Ambush)
 - **Movement Mechanics:** Position-based movement with distance calculations
 - **Energy Management:** Stamina and energy tracking for all animals
 - **CSV Data Export:** Simulation results exported to CSV format
@@ -95,9 +95,8 @@ Simulate predator-prey ecosystem dynamics in a bounded 2D environment with scent
 ## Planned Software Versions
 
 - **Version 0.1:** Initial class structure and basic functionality (current)
-- **Version 1.0:** Fully functional simulation with all animal types and behaviors
-- **Version 2.0:** Enhanced scent model and advanced search algorithms
-- **Version 3.0:** GUI visualization and real-time parameter adjustment
+- **Version 1.0:** Fully functional base simulation with one prey type and one predator type
+- **Version 2.0:** Fully functional base simulation with three prey types and two predator types
 
 ---
 
@@ -112,7 +111,7 @@ Simulate predator-prey ecosystem dynamics in a bounded 2D environment with scent
 - Animal getter/setter methods for attribute access
 - Unit tests for individual classes and behaviors
 - CSV output export for simulation results
-- Batch file test automation
+- Evolutionary trait tracking
 
 ## Excluded Functionality
 
@@ -128,16 +127,17 @@ Simulate predator-prey ecosystem dynamics in a bounded 2D environment with scent
 - Advanced scent diffusion algorithms
 - Additional animal species and behaviors
 - Environmental hazards and obstacles
-- Evolutionary trait tracking
 - Performance profiling and optimization
 
 ---
 
 # 3. Software Capabilities
 
+The capabilities below reflect the current prototype implementation and its planned expansion path for animal movement, map navigation, scent tracking, and a simple predator-prey simulation loop.
+
 ## 3.1 Level-1 Capabilities
 
-1. **Manage Animal State and Behavior**
+1. **Manage Prototype Animal State and Behavior**
 2. **Navigate and Track Position on Map**
 3. **Generate and Track Scent Trails**
 4. **Execute Search and Pursuit Strategies**
@@ -337,14 +337,14 @@ Simulate predator-prey ecosystem dynamics in a bounded 2D environment with scent
 
 | Requirement ID | Level-2 Capability | Functional Requirement |
 |----------------|--------------------|------------------------|
-| FR-1.1.1 | Initialize Animal with Attributes | The Animal Factory shall initialize each animal with required attributes (speed, stealth, stamina, sense, position, energy) within the constructor. |
+| FR-1.1.1 | Initialize Animal with Attributes | The Animal Factory shall initialize each prototype animal with required attributes (speed, stealth, stamina, sense, position, energy) within the constructor. |
 | FR-1.2.1 | Update Animal Attributes | The Animal State Manager shall provide getter/setter methods for all animal attributes with validation. |
 | FR-1.3.1 | Execute Animal Movement | The Movement Engine shall calculate new animal position based on current position, speed, and direction within map boundaries. |
-| FR-1.4.1 | Determine Animal Search Behavior | The Behavior Selector shall select appropriate search strategy (Search, Stalking, Pursuit) based on predator type. |
+| FR-1.4.1 | Determine Animal Search Behavior | The Behavior Selector shall select the appropriate search strategy (Search, Stalking, Pursuit) for the active predator-prey prototype based on behavior context. |
 | FR-2.1.1 | Define Map Structure and Tile Types | The Map Builder shall create a 2D grid with configurable tile types (Plain, Tree, Bush) and validate tile distribution. |
 | FR-2.2.1 | Track Animal Position | The Position Tracker shall maintain current (x, y) coordinates for each animal and update after movement. |
 | FR-2.3.1 | Calculate Movement Constraints | The Constraint Engine shall enforce boundary checks and prevent animals from moving outside the map. |
-| FR-2.4.1 | Build Prey Item Class | The Prey Factory shall instantiate Prey animals with appropriate initial attributes and integrate with Map. |
+| FR-2.4.1 | Build Prey Item Class | The Prey Factory shall instantiate prey-oriented prototype entities and integrate them with the map for simulation use. |
 | FR-3.1.1 | Create and Initialize Scent Trail | The Scent Factory shall initialize Scent objects with decay rate and initial intensity at animal position. |
 | FR-3.2.1 | Update Scent Trail Over Time | The Scent Manager shall update scent distribution across the map for each simulation tick. |
 | FR-3.3.1 | Decay Scent at Specified Rate | The Decay Engine shall reduce scent intensity by specified percentage per level distance. |
@@ -360,8 +360,8 @@ Simulate predator-prey ecosystem dynamics in a bounded 2D environment with scent
 | FR-6.1.1 | Export Simulation Data to CSV | The CSV Exporter shall write simulation results to file in CSV format with proper headers. |
 | FR-6.2.1 | Format Output Data Correctly | The Data Formatter shall ensure all data fields are correctly delimited and formatted. |
 | FR-6.3.1 | Write Data Records | The Record Writer shall append each simulation result as a new row in the CSV file. |
-| FR-7.1.1 | Initialize Simulation Environment | The Simulation Initializer shall create map, animals, and scent system and verify all ready. |
-| FR-7.2.1 | Run Simulation Loop | The Simulation Engine shall execute main loop for each time step and update all animal positions. |
+| FR-7.1.1 | Initialize Simulation Environment | The Simulation Initializer shall create the map, prototype animals, and scent system and verify all core components are ready. |
+| FR-7.2.1 | Run Simulation Loop | The Simulation Engine shall execute the main loop for each time step and update the prototype predator, prey, and plant entities. |
 | FR-7.3.1 | Validate Test Results | The Test Validator shall compare expected and actual test outcomes and report pass/fail. |
 | FR-7.4.1 | Execute Batch Test Suite | The Batch Runner shall execute all test files and collect results for reporting. |
 
@@ -458,14 +458,14 @@ Simulate predator-prey ecosystem dynamics in a bounded 2D environment with scent
 
 | Requirement ID | Level-2 Capability | Requirement Description |
 |----------------|--------------------|------------------------|
-| FR-1.1.1 | Initialize Animal with Attributes | Initialize each animal with required attributes in constructor |
+| FR-1.1.1 | Initialize Animal with Attributes | Initialize each prototype animal with required attributes in the constructor |
 | FR-1.2.1 | Update Animal Attributes | Provide getter/setter methods with validation |
-| FR-1.3.1 | Execute Animal Movement | Calculate new position based on speed and direction |
-| FR-1.4.1 | Determine Animal Search Behavior | Select search strategy based on predator type |
-| FR-2.1.1 | Define Map Structure and Tile Types | Create 2D grid with configurable tile types |
+| FR-1.3.1 | Execute Animal Movement | Calculate a new position based on speed, direction, and map constraints |
+| FR-1.4.1 | Determine Animal Search Behavior | Select the appropriate search strategy for the active predator-prey prototype |
+| FR-2.1.1 | Define Map Structure and Tile Types | Create a 2D grid with configurable tile types |
 | FR-2.2.1 | Track Animal Position | Maintain and update (x, y) coordinates |
 | FR-2.3.1 | Calculate Movement Constraints | Enforce map boundary checks |
-| FR-2.4.1 | Build Prey Item Class | Instantiate Prey animals with initial attributes |
+| FR-2.4.1 | Build Prey Item Class | Instantiate prey-oriented prototype entities for simulation use |
 | FR-3.1.1 | Create and Initialize Scent Trail | Initialize Scent with decay rate and intensity |
 | FR-3.2.1 | Update Scent Trail Over Time | Update scent distribution each tick |
 | FR-3.3.1 | Decay Scent at Specified Rate | Reduce intensity by percentage per distance |
@@ -490,29 +490,27 @@ Simulate predator-prey ecosystem dynamics in a bounded 2D environment with scent
 
 # 15. Future Versions
 
-## Version 1.0 (Current Development)
+## Version 0.2 (Current Prototype)
 
-- Complete implementation of all animal classes (Predator, Prey, Bird, Rabbit, Mouse)
-- Functional scent system with configurable decay
-- Full search, stalking, and pursuit behavior trees
-- Comprehensive unit tests (target: >80% coverage)
-- CSV export for simulation results
+- Working predator-prey-plant prototype with map-based movement and scent tracking
+- Functional animal, map, and scent classes with testable behavior
+- Basic search and pursuit logic implemented through the current simulation harness
+- Unit tests covering core components and simulation behaviors
+- CSV-compatible simulation artifacts for analysis and reporting
+
+## Version 1.0
+
+- Expanded base simulation with more complete predator and prey behavior trees
+- Additional animal subclasses and richer interaction rules
+- Improved test coverage and validation for larger simulation runs
+- More robust CSV output and result analysis support
 
 ## Version 2.0
 
-- Graphical visualization using PyGame or Matplotlib
 - Real-time parameter adjustment during simulation
-- Advanced scent diffusion algorithms (gradient-based)
+- Advanced scent diffusion algorithms and richer environment rules
 - Additional animal species and behavioral variants
-- Performance profiling and optimization
-
-## Version 3.0
-
-- Machine learning-based predator strategy optimization
-- Environmental hazards and obstacle avoidance
-- Evolutionary trait tracking across generations
-- Web-based dashboard for simulation monitoring
-- Distributed simulation across multiple processes
+- Performance profiling and optimization for larger simulations
 
 ## Future Enhancements
 
@@ -526,15 +524,8 @@ Simulate predator-prey ecosystem dynamics in a bounded 2D environment with scent
 
 # 16. Open Issues
 
-> **To Be Completed:**
-
-- What are the exact dimensions of the map grid?
+- Animals are getting stuck and causing a crash.
 - What are the maximum simulation time steps?
-- Are there specific animal spawn locations or randomized?
-- How is stamina recovery implemented (if at all)?
-- What is the exact decay formula for scent trails?
-- Should predators have different search strategy probabilities?
-- Is there a concept of "winning" or "losing" the simulation?
 - How should ties or draws be handled in tests?
 - What format should the CSV headers follow?
 - Are there any performance targets for large simulations (100+ animals)?
