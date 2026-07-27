@@ -152,6 +152,10 @@ class Animal:
             return 1
         elif checkMap[1] == 3:
             return 2
+
+    def _distance(self, point1, point2):
+        return abs(point1[0] - point2[0]) + abs(point1[1] - point2[1])
+
         
 
     # Methods
@@ -196,15 +200,11 @@ class Animal:
         paths = {}
         foundFlag = False
         directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
-        print('current posistion is: {}'.format(map.get_map_point(self.get_position())))
-        print('target is: {}'.format(map.get_map_point(targetTile)))
-        for dir in directions:
-            print(map.get_map_point((targetTile[0] - dir[0], targetTile[1] - dir[1])))
 
-        #print('Start Test')
+
         while len(queue) > 0 and len(queue) < 200 and foundFlag == False:
             p = heapq.heappop(queue)
-            print(len(queue))
+
             searched_list.add(p[1])
             directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
             for dir in directions:
@@ -231,10 +231,19 @@ class Animal:
                             paths.update({new_pos: (g, p[1]) })
                             heapq.heappush(queue, (f,new_pos))
                             queueList.update({new_pos: f}) 
-        #print('end test')
-        #print(g)
-        print(paths)
-        currentNode = (g, targetTile)
+
+        if len(queue) >= 200:
+            minDistance = 100000
+            node = None
+            for i in paths.keys():
+                distance = self._distance(targetTile, i)
+                if minDistance > distance:
+                    minDistance = distance
+                    node = i
+            currentNode = (self._cellWeight(node, map), node)
+        else:
+            currentNode = (g, targetTile)
+
         fullPath = [currentNode]
         while True:
             if currentNode[1] in paths:

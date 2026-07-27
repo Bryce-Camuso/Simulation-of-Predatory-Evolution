@@ -89,7 +89,7 @@ def movementCycle(predator, prey, plants, map, phase, updatePaths = False, debug
             print('preyMoveList = {} \npreyMoveOpertunity = {} \npreyMoveMax = {} \npreyPosition = {} \npreyScent = {}'.format(preyMoveList, preyMovementOpertunity, preyMovementOpertunityMax, prey.get_position(), prey.get_scent().get_scent_trail(100)))
             print()
             print('predatorMoveList = {} \npredatorMoveOpertunity = {} \npredatorMoveMax = {} \npredatorPosition = {} \npredatorScent = {}'.format(predatorMoveList, predatorMovementOpertunity, predatorMovementOpertunityMax, predator.get_position(), predator.get_scent().get_scent_trail(100)))
-        if preyMovementOpertunity == 1:
+        if preyMovementOpertunity == 1 and prey.get_energy() >= 0:
             preyMovementOpertunity = preyMovementOpertunityMax
             prey.set_position(preyMoveList[0][1])
             preyMoveList = preyMoveList [1:]
@@ -101,7 +101,7 @@ def movementCycle(predator, prey, plants, map, phase, updatePaths = False, debug
                 predatorMoveList = predator.get_move_list(prey, map, phase)
         else:
             preyMovementOpertunity -= 1
-        if predatorMovementOpertunity == 1:
+        if predatorMovementOpertunity == 1 and predator.get_energy() >= 0:
             predatorMovementOpertunity = predatorMovementOpertunityMax
             predator.set_position(predatorMoveList[0][1])
             predatorMoveList = predatorMoveList [1:]
@@ -117,7 +117,7 @@ def movementCycle(predator, prey, plants, map, phase, updatePaths = False, debug
 
 placeAnimals(predator, prey, plants, map)
 
-while not prey.get_escaped() and preyAlive:
+while not prey.get_escaped() and preyAlive and predator.get_energy() >= 0:
     if distance(prey.get_position(), predator.get_position()) > 100:
         # searching phase
         movementCycle(predator, prey, plants, map, 1)
