@@ -59,7 +59,7 @@ class Map:
         '''
         returnArray = []
         for point in pointList:
-            if point[0] > self._MAPSCALE or point[1] > self._MAPSCALE:
+            if (point[0] > self._MAPSCALE or point[1] > self._MAPSCALE) or (point[0] < 0 or point[1] < 0 ):
                 pass
             else:
                 returnArray.append((point,self._map[point[0]][point[1]]))
@@ -70,7 +70,7 @@ class Map:
         '''
         expects point as a tuple in the form (x,y)
         '''
-        if point[0] > self._MAPSCALE or point[1] > self._MAPSCALE:
+        if (point[0] > self._MAPSCALE or point[1] > self._MAPSCALE) or (point[0] < 0 or point[1] < 0 ):
                 pass
         else:
             return (point,self._map[point[0]][point[1]])
