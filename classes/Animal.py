@@ -1,5 +1,5 @@
 from Scent import Scent
-from Map import Map
+from StaticMap import StaticMap
 import heapq
 import math
 class Animal:
@@ -148,6 +148,8 @@ class Animal:
     
     def _cellWeight(self, point, map):
         checkMap = map.get_map_point(point)
+        if checkMap is None:
+            return None
         if checkMap[1] == 1:
             return 1
         elif checkMap[1] == 3:
@@ -155,6 +157,16 @@ class Animal:
 
     def _distance(self, point1, point2):
         return abs(point1[0] - point2[0]) + abs(point1[1] - point2[1])
+
+    def _path_trace(self, targetTile, parents):
+        path = []
+        currentNode = targetTile
+        while currentNode in parents.keys():
+            path.append(currentNode)
+            currentNode = parents[currentNode]
+        path.append(currentNode) # to get the starting tile
+        path.reverse()
+        return path
 
         
 
@@ -176,6 +188,8 @@ class Animal:
         stealth = self.get_stealth()
         sense = self.get_sense()
         energyCalculation = sense + ((speed * 2) - stamina) + (stealth * 2)
+        if energyCalculation <= 0:
+            energyCalculation = 10
         self.substract_energy(energyCalculation)
 
 
@@ -186,79 +200,62 @@ class Animal:
     def scent_decay(self):
         self._scent.scent_decay()
 
-
     def pathfinding(self, targetTile, map):
         speedToTiles = round(5*math.log(self.get_speed()/2)+5)
         position = self.get_position()
 
         #A* pathfinding https://www.geeksforgeeks.org/dsa/a-search-algorithm/
-        
-        queue = []
-        queueList = {position: 0}
-        heapq.heappush(queue, (0 ,position))
-        searched_list = {position}
-        paths = {}
-        foundFlag = False
         directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+        distanceCal = self._distance
 
+        queue = [(0, position)]
+        hqueue = [(1000, position)]
 
-        while len(queue) > 0 and len(queue) < 200 and foundFlag == False:
-            p = heapq.heappop(queue)
+        bestG = {position: 0}
+        parent = {}
+        mapPointList = {}
+        searchedList = set()
+        foundTile = False
 
-            searched_list.add(p[1])
-            directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
-            for dir in directions:
-                new_pos = (p[1][0] + dir[0], p[1][1] + dir[1])
-                if (new_pos[0] < map.get_map_limit() and new_pos[1] < map.get_map_limit()) and (new_pos[0] >= 0 and new_pos[1] >= 0) and map.get_map_point(new_pos)[1] != 2 and new_pos not in searched_list:
-                    if new_pos == targetTile:
-                        g = self._cellWeight(new_pos, map)
-                        h = abs(new_pos[0] - targetTile[0]) + abs(new_pos[1] - targetTile[1])
-                        f = g + h
-                        searched_list.add(new_pos)
-                        paths.update({new_pos: p })
-                        foundFlag = True
+        while len(queue) > 0 and not foundTile:
+            p = heapq.heappop(queue)[1]
+
+            if p not in searchedList and bestG[p] < speedToTiles:
+                searchedList.add(p)
+                for dir in directions:
+                    new_pos = (p[0] + dir[0], p[1] + dir[1])
+                    if new_pos in mapPointList.keys():
+                        mapValue = mapPointList[new_pos]
                     else:
-                        g = self._cellWeight(new_pos, map)
-                        h = abs(new_pos[0] - targetTile[0]) + abs(new_pos[1] - targetTile[1])
-                        f = g + h
-                        if new_pos in queueList:
-                            if queueList[new_pos] > f:
-                                paths.update({new_pos: (g, p[1]) })
-                                queue.remove(new_pos)
-                                heapq.heappush(queue, (f,new_pos))
-                                queueList[new_pos] = f
+                        mapValue = self._cellWeight(new_pos, map)
+                        mapPointList.update({new_pos: mapValue})
+                    
+
+                    if mapValue is not None and new_pos not in searchedList:
+
+                        if new_pos == targetTile:
+                            parent.update({targetTile: p})
+                            foundTile = True
+                            return self._path_trace(targetTile, parent)
+
                         else:
-                            paths.update({new_pos: (g, p[1]) })
-                            heapq.heappush(queue, (f,new_pos))
-                            queueList.update({new_pos: f}) 
+                            g = bestG[p] + mapValue
+                            h = distanceCal(new_pos, targetTile)
+                            f = g + h
 
-        if len(queue) >= 200:
-            minDistance = 100000
-            node = None
-            for i in paths.keys():
-                distance = self._distance(targetTile, i)
-                if minDistance > distance:
-                    minDistance = distance
-                    node = i
-            currentNode = (self._cellWeight(node, map), node)
-        else:
-            currentNode = (g, targetTile)
+                            if new_pos in bestG.keys():
+                                if bestG[new_pos] > g:
+                                    bestG.update({new_pos: g})
+                                    parent.update({new_pos: p})
+                                    heapq.heappush(queue, (f, new_pos))
+                            else:
+                                bestG.update({new_pos: g})
+                                parent.update({new_pos: p})
+                                heapq.heappush(queue, (f, new_pos))
+                                heapq.heappush(hqueue, (h, new_pos))
 
-        fullPath = [currentNode]
-        while True:
-            if currentNode[1] in paths:
-                currentNode = paths[currentNode[1]]
-                fullPath.append(currentNode)
-            else: break
-        fullPath.reverse()
-        sum = 0
-        for i in range(len(fullPath)):
-            sum = fullPath[i][0] + sum
-            if sum > speedToTiles:
-                return fullPath[:i]
-            else:
-                fullPath[i] = (sum, fullPath[i][1])
-        return fullPath
+        if not foundTile:
+            return self._path_trace(heapq.heappop(hqueue)[1], parent)
     
 
 
@@ -736,15 +733,11 @@ def tester():
 
     print('\nPathFinding')
 
-    testMap = Map()
+    testMap = StaticMap()
     testPoint = (45,45)
-    # quick test to make sure point is reachable
-    if testMap.get_map_point(testPoint)[1] != 2:
-        pass
-    else: testPoint = (55,55)
 
     testArray = test4.pathfinding(testPoint,testMap)
-    if testArray[-1][1] == testPoint:
+    if testArray[-1] == testPoint:
         print('PathFinding: pass')
     else:
         print('PathFinding: false')

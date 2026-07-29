@@ -23,6 +23,9 @@ class Predator(Animal):
 
     def get_ambush_range(self):
         return round(4*math.log(self.get_stealth()/2)+4)
+
+    def get_pursuit_range(self):
+        return round(5*math.log(self.get_speed()/2)+5) * 2
     
 
     # Setters
@@ -32,13 +35,6 @@ class Predator(Animal):
         self._evolutionChance = newEvolutionChance
     
     # Helper functions
-    def _cellWeight(self, point, map):
-        checkMap = map.get_map_point(point)
-        if checkMap[1] == 1:
-            return 1
-        elif checkMap[1] == 3:
-            return 1
-        
     def _searching_tile_weight(self, tileNum):
         if tileNum == 1:
             return 15
@@ -63,33 +59,40 @@ class Predator(Animal):
         if tileNum == 3:
             return 50
     
-    def _search_prey_scent(self, scentList, position):
-        scentStrength = 100
-        scentList.reverse()
-        for i in scentList:
-            if position in i:
-                return scentStrength
-            else:
+    def _scent_list_lookup_builder(self, scentList):
+            scent_lookup = {}
+            scentStrength = 100
+            for i in range(len(scentList)):
+                scent_lookup.update(dict.fromkeys(scentList[-1*(i+1)], scentStrength))
                 scentStrength -= 5
-        return 0
+            return scent_lookup
     
     
-    def _searching_weight(self, tile, preyScentList, targetPos):
+    def _searching_weight(self, tile, preyScentLookup, targetPos):
         global debug
         tileWeight = self._searching_tile_weight(tile[1])
-        scentWeigthPrey = self._search_prey_scent(preyScentList, tile[0])
+        if tile[0] in preyScentLookup:
+            scentWeigthPrey = preyScentLookup[tile[0]] * 2
+        else:
+            scentWeigthPrey = 0
+        
+        midpush = self._distance((500,500), tile[0]) // 20
+
 
         movementNoise = random.randint(-5,5)
         if debug == True:
             movementNoise = 0
         if tile[0] == targetPos: target = 100
         else: target = 0
-        return (tile[0],  (tileWeight + scentWeigthPrey + movementNoise + target))
+        return (tile[0],  ((tileWeight + scentWeigthPrey + movementNoise + target) - (midpush)))
     
-    def _stalking_weight(self, tile, preyScentList, targetPos):
+    def _stalking_weight(self, tile, preyScentLookup, targetPos):
         global debug
         tileWeight = self._stalking_tile_weight(tile[1])
-        scentWeigthPrey = self._search_prey_scent(preyScentList, tile[0])
+        if tile[0] in preyScentLookup:
+            scentWeigthPrey = preyScentLookup[tile[0]]
+        else:
+            scentWeigthPrey = 0
         movementNoise = random.randint(-5,5)
         if debug == True:
                     movementNoise = 0
@@ -97,9 +100,12 @@ class Predator(Animal):
         else: target = 0
         return (tile[0],  (tileWeight + scentWeigthPrey + movementNoise + target))
     
-    def _pursuit_weight(self, tile, preyScentList):
+    def _pursuit_weight(self, tile, preyScentLookup):
         tileWeight = self._pursuit_tile_weight(tile[1])
-        scentWeigthPrey = self._search_prey_scent(preyScentList, tile[0])
+        if tile[0] in preyScentLookup:
+            scentWeigthPrey = preyScentLookup[tile[0]]
+        else:
+            scentWeigthPrey = 0
 
 
         return (tile[0],  (tileWeight + scentWeigthPrey))
@@ -111,20 +117,22 @@ class Predator(Animal):
         preyScentTrail = prey.get_scent().get_scent_trail(self.get_sense())
         preyPosition = prey.get_position()
 
+        preyScentLookup = self._scent_list_lookup_builder(preyScentTrail)
+
         maxWeight = ((-1,-1), -2000)
         if phase == 1:
             for i in mapSearchReturn:
-                returnValue = self._searching_weight(i, preyScentTrail, preyPosition)
+                returnValue = self._searching_weight(i, preyScentLookup, preyPosition)
                 if returnValue[1] > maxWeight[1]:
                     maxWeight = returnValue
         if phase == 2:
             for i in mapSearchReturn:
-                returnValue = self._stalking_weight(i, preyScentTrail, preyPosition)
+                returnValue = self._stalking_weight(i, preyScentLookup, preyPosition)
                 if returnValue[1] > maxWeight[1]:
                     maxWeight = returnValue
         if phase == 3:
             for i in mapSearchReturn:
-                returnValue = self._pursuit_weight(i, preyScentTrail)
+                returnValue = self._pursuit_weight(i, preyScentLookup)
                 if returnValue[1] > maxWeight[1]:
                     maxWeight = returnValue
         return maxWeight
@@ -186,7 +194,7 @@ class Predator(Animal):
             return False
         
         predatorPosition = self.get_position()
-        distance = abs(tile[0] - predatorPosition[0]) + abs(tile[1] - predatorPosition[0])
+        distance = self._distance(tile, predatorPosition)
         ambushRange = self.get_ambush_range()
         if distance <= ambushRange:
             return True
