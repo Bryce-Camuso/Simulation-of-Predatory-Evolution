@@ -9,7 +9,7 @@ class Map:
     bush tile = 3
     '''
     _instance = None
-    _MAPSCALE = 1000
+    _MAPSCALE = 400
 
     
     def _create_map(self):
@@ -20,10 +20,16 @@ class Map:
         20% bush tiles
         '''
         #adds + 1 to complete the grid 0 to _MAPSCALE instead of _MAPSCALE - 1
+        randomList = random.choices(range(0, 100), k=((self._MAPSCALE + 1) * (self._MAPSCALE + 1)))
+
         for x in range(self._MAPSCALE + 1):
             self._map.append([])
             for y in range(self._MAPSCALE + 1):
-                randNum = random.randint(0,100)
+                
+                randNum = randomList[len(randomList) - 1]
+                randomList.pop()
+                # randNum = random.randint(0,100)
+                #print(randNum)
                 if randNum >= 40:
                     self._map[x].append(1)
                 elif randNum >= 20:
