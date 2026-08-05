@@ -16,6 +16,8 @@ class Prey(Animal):
     # Helper Functions
     def _cellWeight(self, point, map):
         checkMap = map.get_map_point(point)
+        if checkMap is None:
+            return None
         if checkMap[1] == 1:
             return 1
         elif checkMap[1] == 3:
@@ -45,53 +47,57 @@ class Prey(Animal):
         if tileNum == 3:
             return 50
     
-    def _search_flower_scent(self, scentList, position):
-        scentStrength = 100
-        scentList.reverse()
-        for i in scentList:
-            if position in i:
-                return scentStrength
-            else:
-                scentStrength -= 5
-        return 0
     
-    def _search_predator_scent(self, scentList, position):
+    def _scent_list_lookup_builder(self, scentList):
+        scent_lookup = {}
         scentStrength = 100
-        scentList.reverse()
-        for i in scentList:
-            if position in i:
-                return scentStrength
-            else:
-                scentStrength -= 5
-        return 0
+        for i in range(len(scentList)):
+            scent_lookup.update(dict.fromkeys(scentList[-1*(i+1)], scentStrength))
+            scentStrength -= 5
+        return scent_lookup
+
     
-    def _searching_weight(self, tile, predatorScentList, flowerScentList, targetPos):
+    def _searching_weight(self, tile, flowerScentLookup, targetPos, movementNoise, midpoint):
         global debug
         tileWeight = self._searching_tile_weight(tile[1])
-        scentWeigthFlower = self._search_flower_scent(flowerScentList, tile[0])
-        scentWeigthPredator = self._search_predator_scent(predatorScentList, tile[0]) //2
-        movementNoise = random.randint(-5,5)
+        if tile[0] in flowerScentLookup:
+            scentWeigthFlower = flowerScentLookup[tile[0]]
+        else:
+            scentWeigthFlower = 0
+        midpush = self._distance((midpoint,midpoint), tile[0]) // 20 # this was added to help push both animals towards the middle of the map for more consistant interactions.
+        #movementNoise = random.randint(-5,5)
+
+
         if debug:
             movementNoise = 0
         if tile[0] == targetPos: target = 100
         else: target = 0
-        return (tile[0],  (tileWeight + (scentWeigthFlower - scentWeigthPredator) + movementNoise + target))
+        return (tile[0],  (tileWeight + scentWeigthFlower + movementNoise + target - midpush))
     
-    def _stalking_weight(self, tile, predatorScentList, flowerScentList, targetPos):
+    def _stalking_weight(self, tile, predatorScentLookup, flowerScentLookup, targetPos, movementNoise):
         global debug
         tileWeight = self._stalking_tile_weight(tile[1])
-        scentWeigthFlower = self._search_flower_scent(flowerScentList, tile[0]) // 2
-        scentWeigthPredator = self._search_predator_scent(predatorScentList, tile[0])
-        movementNoise = random.randint(-5,5)
+        if tile[0] in flowerScentLookup:
+            scentWeigthFlower = flowerScentLookup[tile[0]]
+        else:
+            scentWeigthFlower = 0
+        if tile[0] in predatorScentLookup:
+            scentWeigthPredator = predatorScentLookup[tile[0]] // 2
+        else:
+            scentWeigthPredator = 0
+        #movementNoise = random.randint(-5,5)
         if debug:
             movementNoise = 0
         if tile[0] == targetPos: target = 100
         else: target = 0
         return (tile[0],  (tileWeight + (scentWeigthFlower - scentWeigthPredator) + movementNoise + target))
     
-    def _pursuit_weight(self, tile, predatorScentList):
+    def _pursuit_weight(self, tile, predatorScentLookup):
         tileWeight = self._pursuit_tile_weight(tile[1])
-        scentWeigthPredator = self._search_predator_scent(predatorScentList, tile[0]) * 2
+        if tile[0] in predatorScentLookup:
+            scentWeigthPredator = predatorScentLookup[tile[0]] * 2
+        else:
+            scentWeigthPredator = 0
 
         return (tile[0],  (tileWeight - scentWeigthPredator))
         
@@ -102,20 +108,29 @@ class Prey(Animal):
         flowerPosition = flower.get_position()
         predatorScentTrail = predator.get_scent().get_scent_trail(self.get_sense())
 
+        randomList = random.choices(range(-5, 5), k=len(mapSearchReturn))
+
         maxWeight = ((-1,-1), -2000)
         if phase == 1:
+            flowerScentLookup = self._scent_list_lookup_builder(flowerScentTrail)
+            midpoint = map.get_map_limit() // 2
             for i in mapSearchReturn:
-                returnValue = self._searching_weight(i, predatorScentTrail, flowerScentTrail, flowerPosition)
+                returnValue = self._searching_weight(i, flowerScentLookup, flowerPosition, randomList[-1], midpoint)
+                randomList.pop()
                 if returnValue[1] > maxWeight[1]:
                     maxWeight = returnValue
         if phase == 2:
+            flowerScentLookup = self._scent_list_lookup_builder(flowerScentTrail)
+            predatorScentLookup = self._scent_list_lookup_builder(predatorScentTrail)
             for i in mapSearchReturn:
-                returnValue = self._stalking_weight(i, predatorScentTrail, flowerScentTrail, flowerPosition)
+                returnValue = self._stalking_weight(i, predatorScentLookup, flowerScentLookup, flowerPosition, randomList[-1])
+                randomList.pop()
                 if returnValue[1] > maxWeight[1]:
                     maxWeight = returnValue
         if phase == 3:
+            predatorScentLookup = self._scent_list_lookup_builder(predatorScentTrail)
             for i in mapSearchReturn:
-                returnValue = self._pursuit_weight(i, predatorScentTrail)
+                returnValue = self._pursuit_weight(i, predatorScentLookup)
                 if returnValue[1] > maxWeight[1]:
                     maxWeight = returnValue
         return maxWeight
@@ -142,7 +157,6 @@ class Prey(Animal):
         if self.get_energy() >= 0:
             #potentily add a check for if how much enrgy is left to use and remove final points from list
             maxWeight = self._get_max_weight(predator, flower, map, phase)
-            self.energy_used()
             return self.pathfinding(maxWeight[0], map)
         else: return []
         
@@ -151,14 +165,13 @@ class Prey(Animal):
         predatorEnergy = predator.get_energy()
 
         if energy > predatorEnergy:
-            randNum = random.randint(0, 10000)
+            randNum = random.randint(0, self._ENERGYTOTAL)
             if randNum <= energy:
                 self.substract_energy(randNum)
                 return True
 
         return False
     
-    # potentily add a movement timer that is based on the creatures speed
 
 
 def tester(): 

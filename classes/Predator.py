@@ -22,7 +22,14 @@ class Predator(Animal):
         return self._evolutionChance
 
     def get_ambush_range(self):
-        return round(4*math.log(self.get_stealth()/2)+4)
+        return round(6*math.log(self.get_stealth()/2)+7)  # https://www.desmos.com/calculator/cmxrds2z42
+    
+    def get_pursuit_range(self):
+        # https://www.desmos.com/calculator/yyp9owuqcz
+        if self.get_hunting_strategy == 'pursuit':
+            return round(self.speed_to_tiles() * 1.5)
+        else:
+            return round(self.speed_to_tiles() / 1.5)
     
 
     # Setters
@@ -32,13 +39,6 @@ class Predator(Animal):
         self._evolutionChance = newEvolutionChance
     
     # Helper functions
-    def _cellWeight(self, point, map):
-        checkMap = map.get_map_point(point)
-        if checkMap[1] == 1:
-            return 1
-        elif checkMap[1] == 3:
-            return 1
-        
     def _searching_tile_weight(self, tileNum):
         if tileNum == 1:
             return 15
@@ -63,43 +63,53 @@ class Predator(Animal):
         if tileNum == 3:
             return 50
     
-    def _search_prey_scent(self, scentList, position):
-        scentStrength = 100
-        scentList.reverse()
-        for i in scentList:
-            if position in i:
-                return scentStrength
-            else:
+    def _scent_list_lookup_builder(self, scentList):
+            scent_lookup = {}
+            scentStrength = 100
+            for i in range(len(scentList)):
+                scent_lookup.update(dict.fromkeys(scentList[-1*(i+1)], scentStrength))
                 scentStrength -= 5
-        return 0
+            return scent_lookup
     
     
-    def _searching_weight(self, tile, preyScentList, targetPos):
+    def _searching_weight(self, tile, preyScentLookup, targetPos, movementNoise, midpoint):
         global debug
         tileWeight = self._searching_tile_weight(tile[1])
-        scentWeigthPrey = self._search_prey_scent(preyScentList, tile[0])
+        if tile[0] in preyScentLookup:
+            scentWeigthPrey = preyScentLookup[tile[0]] * 2
+        else:
+            scentWeigthPrey = 0
+        
+        midpush = self._distance((midpoint,midpoint), tile[0]) // 20
 
-        movementNoise = random.randint(-5,5)
+
+        #movementNoise = random.randint(-5,5)
         if debug == True:
             movementNoise = 0
         if tile[0] == targetPos: target = 100
         else: target = 0
-        return (tile[0],  (tileWeight + scentWeigthPrey + movementNoise + target))
+        return (tile[0],  ((tileWeight + scentWeigthPrey + movementNoise + target) - (midpush)))
     
-    def _stalking_weight(self, tile, preyScentList, targetPos):
+    def _stalking_weight(self, tile, preyScentLookup, targetPos, movementNoise):
         global debug
         tileWeight = self._stalking_tile_weight(tile[1])
-        scentWeigthPrey = self._search_prey_scent(preyScentList, tile[0])
-        movementNoise = random.randint(-5,5)
+        if tile[0] in preyScentLookup:
+            scentWeigthPrey = preyScentLookup[tile[0]]
+        else:
+            scentWeigthPrey = 0
+        #movementNoise = random.randint(-5,5)
         if debug == True:
                     movementNoise = 0
         if tile[0] == targetPos: target = 100
         else: target = 0
         return (tile[0],  (tileWeight + scentWeigthPrey + movementNoise + target))
     
-    def _pursuit_weight(self, tile, preyScentList):
+    def _pursuit_weight(self, tile, preyScentLookup):
         tileWeight = self._pursuit_tile_weight(tile[1])
-        scentWeigthPrey = self._search_prey_scent(preyScentList, tile[0])
+        if tile[0] in preyScentLookup:
+            scentWeigthPrey = preyScentLookup[tile[0]]
+        else:
+            scentWeigthPrey = 0
 
 
         return (tile[0],  (tileWeight + scentWeigthPrey))
@@ -111,20 +121,26 @@ class Predator(Animal):
         preyScentTrail = prey.get_scent().get_scent_trail(self.get_sense())
         preyPosition = prey.get_position()
 
+        preyScentLookup = self._scent_list_lookup_builder(preyScentTrail)
+        randomList = random.choices(range(-5, 5), k=len(mapSearchReturn))
+
         maxWeight = ((-1,-1), -2000)
         if phase == 1:
+            midpoint = map.get_map_limit() // 2
             for i in mapSearchReturn:
-                returnValue = self._searching_weight(i, preyScentTrail, preyPosition)
+                returnValue = self._searching_weight(i, preyScentLookup, preyPosition, randomList[-1], midpoint)
+                randomList.pop()
                 if returnValue[1] > maxWeight[1]:
                     maxWeight = returnValue
         if phase == 2:
             for i in mapSearchReturn:
-                returnValue = self._stalking_weight(i, preyScentTrail, preyPosition)
+                returnValue = self._stalking_weight(i, preyScentLookup, preyPosition, randomList[-1])
+                randomList.pop()
                 if returnValue[1] > maxWeight[1]:
                     maxWeight = returnValue
         if phase == 3:
             for i in mapSearchReturn:
-                returnValue = self._pursuit_weight(i, preyScentTrail)
+                returnValue = self._pursuit_weight(i, preyScentLookup)
                 if returnValue[1] > maxWeight[1]:
                     maxWeight = returnValue
         return maxWeight
@@ -160,6 +176,8 @@ class Predator(Animal):
 
         if localCopy[statToChange] > 100:
             localCopy[statToChange] = 100
+        if localCopy[statToChange] < 1:
+            localCopy[statToChange] = 1
 
         return localCopy
 
@@ -177,9 +195,8 @@ class Predator(Animal):
         if self.get_energy() >= 0:
             #potentily add a check for if how much enrgy is left to use and remove final points from list
             maxWeight = self._get_max_weight(prey, map, phase)
-            self.energy_used()
             return self.pathfinding(maxWeight[0], map)
-
+        else: return []
 
 
     def ambush_check(self, tile):
@@ -187,29 +204,26 @@ class Predator(Animal):
             return False
         
         predatorPosition = self.get_position()
-        distance = abs(tile[0] - predatorPosition[0]) + abs(tile[1] - predatorPosition[0])
+        distance = self._distance(tile, predatorPosition)
         ambushRange = self.get_ambush_range()
         if distance <= ambushRange:
             return True
         
-    def ambush(self, prey, map):
+    def ambush(self, prey):
         if self.get_hunting_strategy() != 'ambush':
             return False
         
         preyPosition = prey.get_position()
-        ambushRange = self.get_ambush_range()
         if self.ambush_check(preyPosition):
-            path = self.pathfinding(preyPosition, map)
+            pass
         else:
             return False
 
-        if path[-1][0] <= ambushRange:
-            # cost of an ambush
-            self.substract_energy(self.get_stealth() * 3)
-            self.set_position(preyPosition)
-            return True
-        else:
-            return False
+        
+        # cost of an ambush
+        self.substract_energy(self.get_stealth() * 3)
+        self.set_position(preyPosition)
+        return True
 
     def reproduction(self):
         global debug
@@ -218,7 +232,7 @@ class Predator(Animal):
             numberOfKids = 2
         evolutionChance = self.get_evolution_chance()
         startingStats = [self.get_hunting_strategy(), evolutionChance, self.get_speed(), self.get_stealth(), self.get_stamina(), self.get_sense()]
-        kids = []
+        kids = [Predator(startingStats[0], startingStats[1], startingStats[2], startingStats[3], startingStats[4], startingStats[5], (0,0))] # returns a fresh copy of the class to represent intself.
         for i in range(numberOfKids):
             newStats = startingStats
             if random.randint(0,100) < evolutionChance or debug == True:
@@ -377,6 +391,13 @@ def tester():
     print('---------------------------------------------------------------------------------------------------------------------')
     print('Reproduction')
     kids = testPredator.reproduction()
+    parent = kids[0]
+    kids = kids[1:]
+    if (parent.get_hunting_strategy() == testPredator.get_hunting_strategy() and parent.get_evolution_chance() == testPredator.get_evolution_chance()) and (parent.get_speed() == testPredator.get_speed() and parent.get_stealth() == testPredator.get_stealth() and parent.get_stamina() == testPredator.get_stamina() and parent.get_sense() == testPredator.get_sense()) and parent.get_position() == (0,0):
+        print('reproduction: pass')
+    else:
+        print('reproduction: false')
+        
     for i in kids:
         if (i.get_hunting_strategy() == testPredator.get_hunting_strategy() and i.get_evolution_chance() == testPredator.get_evolution_chance()) and (i.get_speed() != testPredator.get_speed() or i.get_stealth() != testPredator.get_stealth() or i.get_stamina() != testPredator.get_stamina() or i.get_sense() != testPredator.get_sense()) and i.get_position() == (0,0):
             print('reproduction: pass')

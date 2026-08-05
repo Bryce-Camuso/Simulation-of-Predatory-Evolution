@@ -6,6 +6,7 @@ class Plant:
     def __init__(self, position):
         self._position = position
         self._scent = Scent()
+        self._scent.update_scent_trail(self.get_position(), 0)
 
     def get_position(self):
         return self._position

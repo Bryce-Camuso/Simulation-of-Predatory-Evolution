@@ -1,4 +1,4 @@
 *.bat
-documents/*
+*.txt
 __pycache__
 test

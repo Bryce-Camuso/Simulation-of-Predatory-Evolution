@@ -9,7 +9,7 @@ class Map:
     bush tile = 3
     '''
     _instance = None
-    _MAPSCALE = 1000
+    _MAPSCALE = 300
 
     
     def _create_map(self):
@@ -20,10 +20,16 @@ class Map:
         20% bush tiles
         '''
         #adds + 1 to complete the grid 0 to _MAPSCALE instead of _MAPSCALE - 1
+        randomList = random.choices(range(0, 100), k=((self._MAPSCALE + 1) * (self._MAPSCALE + 1)))
+
         for x in range(self._MAPSCALE + 1):
             self._map.append([])
             for y in range(self._MAPSCALE + 1):
-                randNum = random.randint(0,100)
+                
+                randNum = randomList[len(randomList) - 1]
+                randomList.pop()
+                # randNum = random.randint(0,100)
+                #print(randNum)
                 if randNum >= 40:
                     self._map[x].append(1)
                 elif randNum >= 20:
@@ -41,6 +47,9 @@ class Map:
 
         return self._instance
 
+    def get_map_limit(self):
+        return self._MAPSCALE
+
     def get_x(self, xRow):
         return self._map[xRow].copy()
     
@@ -56,7 +65,7 @@ class Map:
         '''
         returnArray = []
         for point in pointList:
-            if point[0] > self._MAPSCALE or point[1] > self._MAPSCALE:
+            if (point[0] > self._MAPSCALE or point[1] > self._MAPSCALE) or (point[0] < 0 or point[1] < 0 ):
                 pass
             else:
                 returnArray.append((point,self._map[point[0]][point[1]]))
@@ -67,7 +76,7 @@ class Map:
         '''
         expects point as a tuple in the form (x,y)
         '''
-        if point[0] > self._MAPSCALE or point[1] > self._MAPSCALE:
+        if (point[0] > self._MAPSCALE or point[1] > self._MAPSCALE) or (point[0] < 0 or point[1] < 0 ):
                 pass
         else:
             return (point,self._map[point[0]][point[1]])
@@ -80,6 +89,7 @@ class Map:
 
 def tester():
     map1 = Map()
+
 
     print('---------------------------------------------------------------------------------------------------------------------')
 
@@ -100,6 +110,11 @@ def tester():
         print('Map Size Y Scale: pass')
     else:
         print('Map Size Y Scale: fail')
+
+    if map1.get_map_limit() == map1._MAPSCALE:
+        print('Map limit: pass')
+    else:
+        print('Map limit: fail')
     
     print('---------------------------------------------------------------------------------------------------------------------')
     print('Map Tile Distribution test')
