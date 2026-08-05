@@ -22,13 +22,14 @@ class Predator(Animal):
         return self._evolutionChance
 
     def get_ambush_range(self):
-        return round(4*math.log(self.get_stealth()/2)+4)
-
+        return round(6*math.log(self.get_stealth()/2)+7)  # https://www.desmos.com/calculator/cmxrds2z42
+    
     def get_pursuit_range(self):
+        # https://www.desmos.com/calculator/yyp9owuqcz
         if self.get_hunting_strategy == 'pursuit':
-            return round(5*math.log(self.get_speed()/2)+5) * 2
+            return round(self.speed_to_tiles() * 1.5)
         else:
-            return round(5*math.log(self.get_speed()/2)+5) // 2
+            return round(self.speed_to_tiles() / 1.5)
     
 
     # Setters
@@ -175,6 +176,8 @@ class Predator(Animal):
 
         if localCopy[statToChange] > 100:
             localCopy[statToChange] = 100
+        if localCopy[statToChange] < 1:
+            localCopy[statToChange] = 1
 
         return localCopy
 

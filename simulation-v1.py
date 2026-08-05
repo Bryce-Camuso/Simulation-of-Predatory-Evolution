@@ -2,11 +2,9 @@
 import sys
 import random as r
 import math
-import time
-import traceback
 import argparse
 import concurrent.futures
-from functools import partial
+import pandas as pd
 
 sys.path.append('classes/')
 from classes.Predator import Predator
@@ -104,40 +102,32 @@ def movementCycle1(predator, prey, plants, map, phase, preyEating = False, debug
             preyTarget = i
 
     #formula for finding movement speed to movment opertunities
-    # translation graph https://www.desmos.com/calculator/h4c9voicdq
-    preyMovementOpertunityMax = 60 // (round(5*math.log(prey.get_speed()/2)+5))
+    # translation graph https://www.desmos.com/calculator/yx1c7ib3lb
+    preyMovementOpertunityMax = 80 // prey.speed_to_tiles()
     preyMovementOpertunity = preyMovementOpertunityMax
-    predatorMovementOpertunityMax = 60 // (round(5*math.log(predator.get_speed()/2)+5))
+    predatorMovementOpertunityMax = 80 // predator.speed_to_tiles()
     predatorMovementOpertunity = predatorMovementOpertunityMax
 
-    scentCountDownMax = 20
+    scentCountDownMax = 25 # will update 3 times per movement cycle
     scentCountDown = scentCountDownMax
     preyMoveList = prey.get_move_list(predator, preyTarget, map, phase)
     predatorMoveList = predator.get_move_list(prey, map, phase)
 
-    preySence = prey.get_sense()
-    predatorStealth = predator.get_stealth()
-    
-    for i in range(0,61):
+    for i in range(0,81):
         if debug:
             print('------------------------------------------------------------------------------------------------------------------------------------------')
             print(i)
-            print('preyMoveList = {} \npreyMoveOpertunity = {} \npreyMoveMax = {} \npreyPosition = {} \npreyScent = {}'.format(preyMoveList, preyMovementOpertunity, preyMovementOpertunityMax, prey.get_position(), prey.get_scent().get_scent_trail(100)))
+            print('preyMoveList = {} \npreyMoveOpertunity = {} \npreyMoveMax = {} \npreyPosition = {}'.format(preyMoveList, preyMovementOpertunity, preyMovementOpertunityMax, prey.get_position(), prey.get_scent().get_scent_trail(100)))
             print()
-            print('predatorMoveList = {} \npredatorMoveOpertunity = {} \npredatorMoveMax = {} \npredatorPosition = {} \npredatorScent = {}'.format(predatorMoveList, predatorMovementOpertunity, predatorMovementOpertunityMax, predator.get_position(), predator.get_scent().get_scent_trail(100)))
+            print('predatorMoveList = {} \npredatorMoveOpertunity = {} \npredatorMoveMax = {} \npredatorPosition = {}'.format(predatorMoveList, predatorMovementOpertunity, predatorMovementOpertunityMax, predator.get_position(), predator.get_scent().get_scent_trail(100)))
+    
         if preyMovementOpertunity == 1 and prey.get_energy() >= 0 and not preyEating:
             preyMovementOpertunity = preyMovementOpertunityMax
             prey.set_position(preyMoveList[0])
             preyMoveList = preyMoveList [1:]
             if len(preyMoveList) == 0:
                 preyMoveList = prey.get_move_list(predator, preyTarget, map, phase)
-        elif phase == 2 and preyEating and preyMovementOpertunity == 1:
-            preyMovementOpertunity = preyMovementOpertunityMax
-            chance = (predatorStealth + distance(prey.get_position(), predator.get_position())) - preySence
-            if chance < 100:
-                spotAttempt = r.randint(0,100)
-                if spotAttempt > chance:
-                    return True
+
         else:
             preyMovementOpertunity -= 1
         if predatorMovementOpertunity == 1 and predator.get_energy() >= 0:
@@ -158,24 +148,22 @@ def movementCycle1(predator, prey, plants, map, phase, preyEating = False, debug
             
         else:
             scentCountDown -= 1
-    return False
         
 def movementCycle2(predator, prey, plants, map, phase, preyType, stunned = False, debug = False):
     preyTarget = plants[0]
 
     #formula for finding movement speed to movment opertunities
-    # translation graph https://www.desmos.com/calculator/h4c9voicdq
+    # translation graph https://www.desmos.com/calculator/yx1c7ib3lb
     if not stunned:
-        preyMovementOpertunityMax = 60 // (round(5*math.log(prey.get_speed()/2)+5))
+        preyMovementOpertunityMax = 80 // prey.speed_to_tiles() # change this here
         preyMovementOpertunity = preyMovementOpertunityMax
-    predatorMovementOpertunityMax = 60 // (round(5*math.log(predator.get_speed()/2)+5))
+    predatorMovementOpertunityMax = 80 // predator.speed_to_tiles()
     predatorMovementOpertunity = predatorMovementOpertunityMax
 
     preyMoveList = prey.get_move_list(predator, preyTarget, map, phase)
     predatorMoveList = predator.get_move_list(prey, map, phase)
 
-    
-    for i in range(0,61):
+    for i in range(0,81):
         if debug:
             print('------------------------------------------------------------------------------------------------------------------------------------------')
             print(i)
@@ -220,266 +208,371 @@ def movementCycle2(predator, prey, plants, map, phase, preyType, stunned = False
 
 
 
+def simulation(predator, prey, map):
 
-def simulation(predatorType, preyType, map):
-    
+    #set up objects
     r.seed()
-    # class refrences Rabbit(50, 20, 60, 60, (0,0)) Bird(60, 10, 40, 30, (0,0)) Mouse(60, 20, 95, 100, (0,0))
-    if preyType == 'rabbit':
-        prey = Rabbit(50, 20, 60, 60, (0,0))
-    elif preyType == 'mouse':
-            prey = Mouse(60, 20, 95, 100, (0,0))
-    elif preyType == 'bird':
-        prey = Bird(60, 10, 40, 30, (0,0))
     plants = [Plant((0,0)), Plant((0,0)), Plant((0,0)), Plant((0,0))]
+    
+    placeAnimals(predator, prey, plants, map)
+
+    # sim vars
     eatingCyclesMax = 3
     eatingCyclesLeft = eatingCyclesMax
     eatingTarget = None
     eatingPlant = False
+    succesfulStalk = False
+    spotted = False
+    preyCaught = False
+    preyStrugle = False
+    huntingStrategy = predator.get_hunting_strategy()
+    preyType = prey.__class__.__name__
+    preySence = prey.get_sense()
+    predatorStealth = predator.get_stealth()
 
-
+    # limit factors
+    cycleCount = 0
+    startDistance = distance(prey.get_position(), predator.get_position())
 
 
     # simulation
-    startTime = time.time()
-    succsessSearchRate = 0
-    succsessStalkRate = 0
-    succsessSpotRate = 0
-    preyEscapeRate = 0
-    preyCatchRate = 0
-    preyExhaustRate = 0
-    predatorExhaustRate = 0
-    succesfulPredators = []
-    kids = []
+    while not prey.get_escaped() and predator.get_energy() >= 0 and not preyCaught and len(plants) > 0:
+        cycleCount += 1
+        if not spotted and not succesfulStalk:
+            # phase 1 and 2
+            if distance(prey.get_position(), predator.get_position()) > 100:
+                movementCycle1(predator, prey, plants, map, 1, preyEating = eatingPlant)
+                prey.energy_used()
+                predator.energy_used()
+                prey.update_scent_trail()
+                predator.update_scent_trail()
 
-    retries = 100
-    try:    
-        for count in range(retries):
-
-            # reset vars
-            if predatorType == 'ambush' or predatorType == 'pursuit':
-                predator = Predator(predatorType, 10, r.randint(1,100), r.randint(1,100), r.randint(1,100), r.randint(1,100), (0,0))
-            prey._energyLeft = prey._ENERGYTOTAL
-            prey.set_escaped(False)
-            plants = [Plant((0,0)), Plant((0,0)), Plant((0,0)), Plant((0,0))]
-            eatingCyclesLeft = eatingCyclesMax
-            eatingTarget = None
-            eatingPlant = False
-            placeAnimals(predator, prey, plants, map)
-
-
-            # sim vars
-            succesfulSearch = False
-            succesfulStalk = False
-            spotted = False
-            preyCaught = False
-            preyStrugle = False
-            preyType = 'rabbit'
-            huntingStrategy = predator.get_hunting_strategy()
-            
-            while not prey.get_escaped() and predator.get_energy() >= 0 and not preyCaught and len(plants) > 0:
-                # print('predator position = {}'.format(predator.get_position()))
-                # print('predator energy = {}'.format(predator.get_energy()))
-                # print('prey position = {}'.format(prey.get_position()))
-                # print('prey energy = {}'.format(prey.get_energy()))
-                # print('eating Plat = {}'.format(eatingPlant))
-                # print('------------------------------------------------------------------------')
-                if not spotted and not succesfulStalk:
-                    # phase 1 and 2
-                    if distance(prey.get_position(), predator.get_position()) > 100:
-                        movementCycle1(predator, prey, plants, map, 1, preyEating = eatingPlant)
-                        prey.energy_used()
-                        predator.energy_used()
-                        prey.update_scent_trail()
-                        predator.update_scent_trail()
-
-                    elif ((huntingStrategy == 'ambush' and not predator.ambush_check(prey.get_position())) or (huntingStrategy == 'pursuit' and distance(prey.get_position(), predator.get_position()) > predator.get_pursuit_range())): 
-                        spotted = movementCycle1(predator, prey, plants, map, 2, preyEating = eatingPlant)
-                        succesfulSearch = True
-                        prey.energy_used()
-                        predator.energy_used()
-                        prey.update_scent_trail()
-                        predator.update_scent_trail()
-                    else:
-                        succesfulStalk = True
+            elif ((huntingStrategy == 'ambush' and not predator.ambush_check(prey.get_position())) or (huntingStrategy == 'pursuit' and distance(prey.get_position(), predator.get_position()) > predator.get_pursuit_range())): 
+                movementCycle1(predator, prey, plants, map, 2, preyEating = eatingPlant)
+                chance = (predatorStealth + (distance(prey.get_position(), predator.get_position()) * 3)) - preySence # 50 stealth leads to a min range of 26 distance for ambush. Thus 26 * 2 = 52 giving the predator a 52% maximum chance at 50 stealth vs 50 sense
+                if chance < 100:
+                    spotAttempt = r.randint(0,100)
+                    if spotAttempt > chance:
+                        spotted = True
+                prey.energy_used()
+                predator.energy_used()
+                prey.update_scent_trail()
+                predator.update_scent_trail()
+            else:
+                succesfulStalk = True
 
 
-                    if eatingPlant == False:
-                        preyPosition = prey.get_position()
-                        for p in plants:
-                            plantPos = p.get_position()
-                            if preyPosition == plantPos:
-                                eatingPlant = True
-                                eatingCyclesLeft = eatingCyclesMax
-                                eatingTarget = p
+            if eatingPlant == False:
+                preyPosition = prey.get_position()
+                for p in plants:
+                    plantPos = p.get_position()
+                    if preyPosition == plantPos:
+                        eatingPlant = True
+                        eatingCyclesLeft = eatingCyclesMax
+                        eatingTarget = p
 
-                    elif eatingPlant == True and eatingCyclesLeft == 0:
-                        eatingPlant = False
-                        plants.remove(eatingTarget)
-                    else:
-                        eatingCyclesLeft -= 1
+            elif eatingPlant == True and eatingCyclesLeft == 0:
+                eatingPlant = False
+                plants.remove(eatingTarget)
+            else:
+                eatingCyclesLeft -= 1
 
+        else:
+            # phase 3 and 4
+            if huntingStrategy == 'ambush' and predator.ambush_check(prey.get_position()) and not spotted:
+                #phase 3 ambush
+                predator.ambush(prey)
+                killChance = predator.get_stealth() // 2
+                randnum = r.randint(0,100)
+                if randnum < killChance:
+                    preyCaught = True
                 else:
-                    # phase 3 and 4
-                    if huntingStrategy == 'ambush' and predator.ambush_check(prey.get_position()) and not spotted:
-                        #phase 3 ambush
-                        predator.ambush(prey)
-                        killChance = predator.get_stealth()
-                        randnum = r.randint(0,100)
-                        if randnum < killChance:
-                            preyCaught = True
-                        else:
-                            preyStrugle = True
-                            spotted = True
+                    preyStrugle = True
+                    spotted = True
 
-                    elif preyStrugle:
-                        # phase 4
-                        result = prey.strugle(predator)
-                        if not result:
-                            preyCaught = True
-                        else:
-                            predatorPos = predator.get_position()
-                            notFoundPlace = True
-                            countSearcharea = 4
-                            newPos = None
-                            while notFoundPlace:
-                                mapList = prey.search(countSearcharea)
-                                for currentPos in mapList:
-                                    if distance(currentPos, predatorPos) > 1 and seroundingTilesCheck(currentPos, map) and not map.get_map_point(currentPos)[0] == 2:
-                                        notFoundPlace = False
-                                        newPos = currentPos
-                                        break
-                                countSearcharea += 1
-                                                                
-                            prey.set_position(newPos)
-                            
-                            # movelist = prey.get_move_list(predator, plants[0],map,3)
-                            # while len(movelist) >= 3:
-                            #     print('test')
-                            #     movelist = prey.get_move_list(predator, plants[0],map,3)
-                            #     if len(movelist) >= 3:
-                            #         prey.set_position(movelist[2])
-                            preyStrugle = False
+            elif preyStrugle:
+                # phase 4
+                result = prey.strugle(predator)
+                if not result:
+                    preyCaught = True
+                else:
+                    predatorPos = predator.get_position()
+                    notFoundPlace = True
+                    countSearcharea = 4
+                    newPos = None
+                    while notFoundPlace:
+                        mapList = prey.search(countSearcharea)
+                        for currentPos in mapList:
+                            if distance(currentPos, predatorPos) > 1 and seroundingTilesCheck(currentPos, map) and not map.get_map_point(currentPos)[0] == 2:
+                                notFoundPlace = False
+                                newPos = currentPos
+                                break
+                        countSearcharea += 1
+                                                        
+                    prey.set_position(newPos)
+                    preyStrugle = False
 
-                    elif distance(predator.get_position(), prey.get_position()) <= 1:
-                        preyStrugle = True
+            elif distance(predator.get_position(), prey.get_position()) <= 1:
+                preyStrugle = True
 
-                    elif distance(predator.get_position(), prey.get_position()) > predator.get_pursuit_range():
-                        prey.set_escaped(True)
+            elif distance(predator.get_position(), prey.get_position()) > predator.get_pursuit_range():
+                prey.set_escaped(True)
 
-                    elif not spotted:
-                        movementCycle2(predator, prey, plants, map, 3, preyType, stunned=True)
-                        prey.energy_used()
-                        predator.energy_used()
+            elif not spotted:
+                movementCycle2(predator, prey, plants, map, 3, preyType, stunned=True)
+                prey.energy_used()
+                predator.energy_used()
 
-                    else:
-                        #phase 3 pursuit
-                        prey.set_escaped(movementCycle2(predator, prey, plants, map, 3, preyType))
-                        prey.energy_used()
-                        predator.energy_used()
-                    #prey.set_escaped(True)
+            else:
+                #phase 3 pursuit
+                prey.set_escaped(movementCycle2(predator, prey, plants, map, 3, preyType))
+                prey.energy_used()
+                predator.energy_used()
+    if cycleCount == 0:
+        cycleFromDis = startDistance
+    else:
+        cycleFromDis = startDistance / cycleCount
+    if preyCaught:
+        return (1, predator.reproduction(), preyType, cycleFromDis, predator.get_energy(), spotted)
+    else:
+        return (0, [predator], preyType, cycleFromDis, predator.get_energy(), spotted)
 
+                     
 
-                    
-            if succesfulSearch == True:
-                succsessSearchRate += 1
-            if succesfulStalk == True:
-                succsessStalkRate += 1
-            if spotted == True:
-                succsessSpotRate += 1
-            if prey.get_escaped() == True:
-                preyEscapeRate += 1
-            if preyCaught == True:
-                preyCatchRate += 1
-                returnList = predator.reproduction()
-                succesfulPredators.append(returnList[0])
-                if len(returnList) > 1:
-                    kids.extend(returnList[1:])
-            if predator.get_energy() <= 0:
-                predatorExhaustRate += 1
-            if prey.get_energy() <= 0 :
-                preyExhaustRate += 1
-
-            
-
-
-    except:
-        # print('predator position = {}'.format(predator.get_position()))
-        # print('predator energy = {}'.format(predator.get_energy()))
-        # print('prey position = {}'.format(prey.get_position()))
-        # print('prey energy = {}'.format(prey.get_energy()))
-        # print('------------------------------------------------------------------------')
-        traceback.print_exc()
-
-    finally:
-        endTime = time.time()
-        count += 1
-        print('number of retries = {}'.format(retries))
-        print('number of loops = {}'.format(count))
-        print('predator type = {} prey type = {}'.format(huntingStrategy, preyType))
-        print('total time = {} Average time = {}'.format(endTime - startTime, (endTime - startTime) / count))
-        print(succsessSearchRate)
-        print('success search rate = {}'.format(succsessSearchRate / count))
-        print(succsessStalkRate)
-        print('success stalk rate = {}'.format(succsessStalkRate / count))
-        print(succsessSpotRate)
-        print('success spot rate = {}'.format(succsessSpotRate / count))
-        print((succsessSpotRate + succsessStalkRate))
-        print('success phase 2 rate = {}'.format((succsessSpotRate + succsessStalkRate) / count))
-        print(preyEscapeRate)
-        print('escape rate = {}'.format(preyEscapeRate / count))
-        print(preyCatchRate)
-        print('catch rate = {}'.format(preyCatchRate / count))
-        print(predatorExhaustRate)
-        print('predator exhaust rate = {}'.format(predatorExhaustRate / count))
-        print(preyExhaustRate)
-        print('prey exhaust rate = {}'.format(preyExhaustRate / count))
-        if count < 1000 and len(succesfulPredators) > 0:
-            print('parents')
-            for p in succesfulPredators:
-                print('speed = {}, stealth = {}, stamina = {}, sense = {}'.format(p.get_speed(), p.get_stealth(), p.get_stamina(), p.get_sense()))
-            print('------------------------------------------------------------------------')
-            print('kids')
-            for k in kids:
-                print('speed = {}, stealth = {}, stamina = {}, sense = {}'.format(k.get_speed(), k.get_stealth(), k.get_stamina(), k.get_sense())) 
+def firstGenSim(predatorType, prey, map):
+    r.seed()
+    predator = Predator(predatorType, 10, r.randint(1,100), r.randint(1,100), r.randint(1,100), r.randint(1,100), (0,0))
         
-
-
+    return simulation(predator, prey, map)
 
 
 
 if __name__ == "__main__":
-    startingPopulation = 5
     parser = argparse.ArgumentParser()
-
+    
     parser.add_argument("predatorType", type=str, help="What predator type the simulation is using: Ambush | Pursuit")
 
     parser.add_argument("preyType", type=str, help="What prey type the simulation is using: Rabbit | Mouse | Bird")
 
     parser.add_argument("-o", "--output", type=str, help="Redirects the standard output into the designated file location")
 
+    parser.add_argument("-sp", "--startingPopulation", type=str, help="Sets the starting population size (how many predators are in generation 0). Defult = 10,000. < 1000 is not recomended as population will likely go extinct")
+
+    parser.add_argument("-g", "--generation", type=str, help="Sets how many generations the simulation will go through. Defult = 1,000.")
+
+    parser.add_argument("-sm", "--startingMax", type=str, help="Sets the maximum for population size at the start (how many predators are allowed after generation 0). Defult = 5000. < 100 is not recomended as population will likely go extinct")
+
+    parser.add_argument("-em", "--endingMax", type=str, help="Sets the maximum for population size at the end (how many predators are allowed in the final generation). Defult = 500.")
+    
+
     args = parser.parse_args()
 
     predatorType = args.predatorType.lower()
     preyType = args.preyType.lower()
 
-    if args.output:
-        sys.stdout = open(args.output, 'w')
+    if predatorType != 'ambush' and predatorType != 'pursuit':
+        raise ValueError(str(predatorType) + ' is not a valid predatorType. predatorType must = Ambush | Pursuit')
 
-    # optimized_worker = partial(process_data, constant_c=fixed_multiplier)
+    if preyType != 'rabbit' and preyType != 'mouse' and preyType != 'bird':
+        raise ValueError(str(preyType) + ' is not a valid preyType. predatorType must = Rabbit | Mouse | Bird')
 
-    # with concurrent.futures.ProcessPoolExecutor() as executor:
+    # class refrences Rabbit(50, 20, 60, 50, (0,0)) Bird(60, 10, 40, 30, (0,0)) Mouse(60, 20, 95, 80, (0,0))
+    if preyType == 'rabbit':
+        prey = Rabbit(50, 20, 60, 50, (0,0))
+    elif preyType == 'mouse':
+        prey = Mouse(60, 20, 95, 80, (0,0))
+    elif preyType == 'bird':
+        prey = Bird(40, 10, 40, 30, (0,0))
 
-    #     futures = [executor.submit(simulation, predatorType, preyType, map) for _ in range(startingPopulation)]
 
-    #     # futures = [executor.submit(greet_user, name, age, city="Chicago") for name, age in users] example for second gen on
 
-    #     for future in concurrent.futures.as_completed(futures):
-    #         result = future.result()
-    #         print('------------------------------------------------------------------------')
 
-    simulation(predatorType, preyType, map)
+    if args.startingPopulation:
+        sp = int(args.startingPopulation)
+        if sp < 1:
+            raise ValueError('startingPopulation can not be less then 1')
+        else:
+            startingPopulation = sp
+    else:
+        startingPopulation = 1000
 
-    sys.stdout.close()
-    sys.stdout = sys.__stdout__
+    if args.generation:
+        gen = int(args.generation)
+        if gen < 0:
+            raise ValueError('generation can not be less then 0')
+        else:
+            generations = gen
+    else:
+        generations = 50
+
+    if args.startingMax:
+        sm = int(args.startingMax)
+        if sm < 1:
+            raise ValueError('starting max can not be less then 1')
+        else:
+            startMaxPop = sm
+    else:
+        startMaxPop = 200 # starting maximum space of the population
+
+    if args.endingMax:
+        em = int(args.endingMax)
+        if em < 1:
+            raise ValueError('ending max can not be less then 1')
+        else:
+            endMaxPop = em
+    else:
+        endMaxPop = 100 # endding maximum space of the popuation
+    
+    
+    
+    decayAmount = 10
+    diviser = (startMaxPop - endMaxPop) / decayAmount 
+    rateOfDecay = generations // diviser # calculate the rate of decay
+    decayTimer = rateOfDecay
+
+    currentPop = startMaxPop # population size of the current generation
+
+    outputData = pd.DataFrame({
+        'Generation': [],
+        'Hunting Strategy': [],
+        'Speed': [],
+        'Stealth':[],
+        'Stamina': [],
+        'Sense': [],
+        'Hunting Outcome': [],
+        'Prey Type': [],
+        'First Order Facter': [],
+        'Second Order Facter': []
+
+    })
+
+    nextGen = []
+
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+
+        futures = [executor.submit(firstGenSim, predatorType, prey, map) for _ in range(startingPopulation)]
+        
+
+        # First generation
+        tempDataframe = pd.DataFrame({
+                                    'Generation': [],
+                                    'Hunting Strategy': [],
+                                    'Speed': [],
+                                    'Stealth':[],
+                                    'Stamina': [],
+                                    'Sense': [],
+                                    'Hunting Outcome': [],
+                                    'Prey Type': [],
+                                    'cycles':[],
+                                    'energyLeft':[],
+                                    'spoted':[],
+                                    'kids':[]
+
+                                })
+        for future in concurrent.futures.as_completed(futures):
+            result = future.result()
+            tempDataframe = pd.concat([tempDataframe, pd.DataFrame({
+                                                                'Generation': [0],
+                                                                'Hunting Strategy': [result[1][0].get_hunting_strategy()],
+                                                                'Speed': [result[1][0].get_speed()],
+                                                                'Stealth':[result[1][0].get_stealth()],
+                                                                'Stamina': [result[1][0].get_stamina()],
+                                                                'Sense': [result[1][0].get_sense()],
+                                                                'Hunting Outcome': [result[0]],
+                                                                'Prey Type': [result[2]],
+                                                                'cycles':[result[3]],
+                                                                'energyLeft':[result[4]],
+                                                                'spoted':[result[5]],
+                                                                'kids':[result[1]]
+                                                            })], ignore_index=True) # store this info in a temp table.
+
+        # keep only the relevent info for study
+        columns_to_keep = ['Generation', 'Hunting Strategy', 'Speed', 'Stealth', 'Stamina', 'Sense', 'Hunting Outcome', 'Prey Type']
+        outputData = pd.concat([outputData[columns_to_keep], tempDataframe[columns_to_keep]], ignore_index=True)
+        nextGenselcetion = tempDataframe[tempDataframe['Hunting Outcome'] == 1].copy()
+
+        # assuming the first generation is under the population limmit to save runtime and help the population stabilize
+        for idx, val in nextGenselcetion['kids'].items():
+            nextGen.extend(val)
+
+        #second gen onword
+        for g in range(1, generations + 1):
+            print('generation = {}, generation starting size = {}, curent population max = {}'.format(g, len(nextGen), currentPop))
+            futures = [executor.submit(simulation, predators, prey, map) for predators in nextGen]
+            nextGen = []
+            tempDataframe = pd.DataFrame({
+                                    'Generation': [],
+                                    'Hunting Strategy': [],
+                                    'Speed': [],
+                                    'Stealth':[],
+                                    'Stamina': [],
+                                    'Sense': [],
+                                    'Hunting Outcome': [],
+                                    'Prey Type': [],
+                                    'cycles':[],
+                                    'energyLeft':[],
+                                    'spoted':[],
+                                    'kids':[],
+                                    'num of kids':[]
+                                })
+            for future in concurrent.futures.as_completed(futures):
+                result = future.result()
+                tempDataframe = pd.concat([tempDataframe, pd.DataFrame({
+                                                                    'Generation': [g],
+                                                                    'Hunting Strategy': [result[1][0].get_hunting_strategy()],
+                                                                    'Speed': [result[1][0].get_speed()],
+                                                                    'Stealth':[result[1][0].get_stealth()],
+                                                                    'Stamina': [result[1][0].get_stamina()],
+                                                                    'Sense': [result[1][0].get_sense()],
+                                                                    'Hunting Outcome': [result[0]],
+                                                                    'Prey Type': [result[2]],
+                                                                    'cycles':[result[3]],
+                                                                    'energyLeft':[result[4]],
+                                                                    'spoted':[result[5]],
+                                                                    'kids':[result[1]],
+                                                                    'num of kids':[len(result[1])]
+                                                                })], ignore_index=True) # store this info in a temp table. 
+
+            # keep only the relevent info for study
+            columns_to_keep = ['Generation', 'Hunting Strategy', 'Speed', 'Stealth', 'Stamina', 'Sense', 'Hunting Outcome', 'Prey Type']
+            outputData = pd.concat([outputData[columns_to_keep], tempDataframe[columns_to_keep]], ignore_index=True)
+            # only consider predators that caught prey
+            nextGenselcetion = tempDataframe[tempDataframe['Hunting Outcome'] == 1].copy()
+            numOfKidsSum = nextGenselcetion['num of kids'].sum()
+            if numOfKidsSum > currentPop:
+                averageNumbOfKids = numOfKidsSum / len(nextGenselcetion) # should be 2 but is derived for above average cases
+                # once a run is compleate calculate second order facters into weighted average for second order.
+                nextGenselcetion['first order'] = (nextGenselcetion['Speed'] + nextGenselcetion['Stealth'] + nextGenselcetion['Stamina'] + nextGenselcetion['Sense']) / 4
+                nextGenselcetion['spoted Convertion'] = nextGenselcetion['spoted'].astype(int)
+                # finds the weighted average of these three terms to form a second order tie braker selection
+                maxCycles = nextGenselcetion['cycles'].max()
+                nextGenselcetion['second order'] = (nextGenselcetion['cycles'] / maxCycles) * 0.4 + (nextGenselcetion['energyLeft'] / prey.get_energy_total()) * 0.2 + nextGenselcetion['spoted Convertion'] * 0.4
+
+                # select top n canadents from first and second order.
+                if g < generations // 2:
+                    topOfGen = nextGenselcetion.sort_values(by=['first order', 'second order']).head(int(currentPop / averageNumbOfKids)) # devided by average to get a close aproximation of population size. Maximize the stat total while having the max weighted average
+                else:
+                    topOfGen = nextGenselcetion.sort_values(by=['first order', 'second order'], ascending=[True,False]).head(int(currentPop / averageNumbOfKids)) # devided by average to get a close aproximation of population size. Minimize the stat total while having the max weighted average
+                    
+                                    
+                for idx, val in topOfGen['kids'].items():
+                    nextGen.extend(val)
+            else:
+                for idx, val in nextGenselcetion['kids'].items():
+                    nextGen.extend(val)
+
+            if decayTimer <= 1:
+                decayTimer = rateOfDecay
+                currentPop -= decayAmount
+            else:
+                decayTimer -= 1
+    print('Final generation = {}, Final generation size = {}, Final population max = {}'.format(g, len(nextGen), currentPop))
+    try:
+        if args.output:
+            outputData.to_csv(args.output, index=False)
+        else:
+            outputData.to_csv('csv/output.csv', index=False)
+    except PermissionError:
+         print('permission denied to write to output file')
+         outputData.to_csv('csv/output.txt', index=False)
         

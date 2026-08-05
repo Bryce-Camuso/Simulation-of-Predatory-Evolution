@@ -9,7 +9,7 @@ class Map:
     bush tile = 3
     '''
     _instance = None
-    _MAPSCALE = 400
+    _MAPSCALE = 300
 
     
     def _create_map(self):

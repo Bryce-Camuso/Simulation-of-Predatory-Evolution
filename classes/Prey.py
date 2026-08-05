@@ -172,7 +172,6 @@ class Prey(Animal):
 
         return False
     
-    # potentily add a movement timer that is based on the creatures speed
 
 
 def tester(): 

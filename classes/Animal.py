@@ -61,9 +61,13 @@ class Animal:
     
     def get_energy(self):
         return self._energyLeft
+
+    def get_energy_total(self):
+        return self._ENERGYTOTAL
     
     def get_scent(self):
         return self._scent
+
     
     # setters
     
@@ -171,6 +175,10 @@ class Animal:
         
 
     # Methods
+    def speed_to_tiles(self):
+        return round(9*math.log(self.get_speed()/2)+10)
+
+    
     def search(self, endLevel):
         #add in negative check
         position = self.get_position()
@@ -201,7 +209,7 @@ class Animal:
         self._scent.scent_decay()
 
     def pathfinding(self, targetTile, map):
-        speedToTiles = round(5*math.log(self.get_speed()/2)+5)
+        speedToTiles = self.speed_to_tiles()
         position = self.get_position()
 
         #A* pathfinding https://www.geeksforgeeks.org/dsa/a-search-algorithm/
@@ -216,7 +224,7 @@ class Animal:
         mapPointList = {}
         searchedList = set()
         foundTile = False
-
+        # added a queue cut off to help speed up searching while not losing two many paths. Maximum queue size from testing sits around 90 while 70 only cuts out about 1 tile fromt the final path.
         while len(queue) > 0 and not foundTile:
             p = heapq.heappop(queue)[1]
 
@@ -293,10 +301,15 @@ def tester():
     else:
         print('position: fail')
 
-    if test1.get_energy() == 10000:
+    if test1.get_energy() == test1._ENERGYTOTAL:
         print('energy: pass')
     else:
         print('energy: fail')
+
+    if test1.get_energy_total() == test1._ENERGYTOTAL:
+        print('energy total: pass')
+    else:
+        print('energy total: fail')
 
     if isinstance(test1.get_scent(), Scent):
         print('scent: pass')
