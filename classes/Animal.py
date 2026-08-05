@@ -176,6 +176,7 @@ class Animal:
 
     # Methods
     def speed_to_tiles(self):
+        # graph https://www.desmos.com/calculator/jtn1acpevr
         return round(9*math.log(self.get_speed()/2)+10)
 
     
@@ -225,7 +226,7 @@ class Animal:
         searchedList = set()
         foundTile = False
         # added a queue cut off to help speed up searching while not losing two many paths. Maximum queue size from testing sits around 90 while 70 only cuts out about 1 tile fromt the final path.
-        while len(queue) > 0 and not foundTile:
+        while len(queue) > 0 and len(queue) < 70 and  not foundTile:
             p = heapq.heappop(queue)[1]
 
             if p not in searchedList and bestG[p] < speedToTiles:

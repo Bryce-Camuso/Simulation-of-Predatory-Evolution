@@ -224,7 +224,7 @@ def tester():
     # stuck on how to test a function with randomness built in.
 
     testMoveList = testPrey.get_move_list(testPredator, testPlant, testMap, 1)
-    exampleMoveList = [(1, (25, 25)), (2, (25, 26)), (3, (25, 27)), (4, (25, 28)), (5, (25, 29)), (6, (26, 29)), (7, (27, 29)), (8, (28, 29)), (9, (29, 29)), (11, (29, 30)), (12, (30, 30))]
+    exampleMoveList = [(25, 25), (25, 26), (25, 27), (25, 28), (25, 29), (26, 29), (27, 29), (28, 29), (29, 29), (29, 30), (30, 30)]
     testFlag = False
     for i in range(len(exampleMoveList)):
         if exampleMoveList[i] == testMoveList[i]:
@@ -237,7 +237,7 @@ def tester():
 
     print('\nPhase 2 (Stalking) test')
     testMoveList = testPrey.get_move_list(testPredator, testPlant, testMap, 2)
-    exampleMoveList = [(1, (25, 25)), (2, (25, 26)), (3, (25, 27)), (4, (25, 28)), (5, (25, 29)), (6, (26, 29)), (7, (27, 29)), (8, (28, 29)), (9, (29, 29)), (11, (29, 30)), (12, (30, 30))]
+    exampleMoveList = [(25, 25), (25, 26), (25, 27), (25, 28), (25, 29), (26, 29), (27, 29), (28, 29), (29, 29), (29, 30), (30, 30)]
     testFlag = False
     for i in range(len(exampleMoveList)):
         if exampleMoveList[i] == testMoveList[i]:
@@ -250,7 +250,7 @@ def tester():
 
     print('\nPhase 3 (pursuit) test')
     testMoveList = testPrey.get_move_list(testPredator, testPlant, testMap, 3)
-    exampleMoveList = [(0, (25, 25)), (1, (25, 26))]
+    exampleMoveList = [(25, 25), (25, 26)]
     testFlag = False
     for i in range(len(exampleMoveList)):
         if exampleMoveList[i] == testMoveList[i]:

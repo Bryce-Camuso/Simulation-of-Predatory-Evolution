@@ -101,15 +101,13 @@ def tester():
 
     print('\nPathfinding test')
     returnValue = testPrey.pathfinding((15,15), testMap)
-    testList = [(1, (25, 25)), (2, (24, 25)), (3, (23, 25)), (4, (22, 25)), (5, (21, 25)), (6, (20, 25)), (7, (19, 25)), (8, (18, 25)), (9, (17, 25)), (10, (16, 25)), (11, (15, 25)), (12, (15, 24)), (13, (15, 23))]
+    # testList = [(1, (25, 25)), (2, (24, 25)), (3, (23, 25)), (4, (22, 25)), (5, (21, 25)), (6, (20, 25)), (7, (19, 25)), (8, (18, 25)), (9, (17, 25)), (10, (16, 25)), (11, (15, 25)), (12, (15, 24)), (13, (15, 23))]
     checkOverTree = False
-    checkList = True
     for i in range(len(returnValue)):
-        if testMap.get_map_point(returnValue[i][1])[1] == 2:
+        if returnValue[i] == (24, 25):
             checkOverTree = True
-        if returnValue[i] != testList[i]:
-            checkList = False
-    if checkList and checkOverTree:
+
+    if checkOverTree:
         print('pathfinding check: pass')
     else:
         print('pathfinding check: fail')

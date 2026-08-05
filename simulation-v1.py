@@ -561,12 +561,15 @@ if __name__ == "__main__":
                 for idx, val in nextGenselcetion['kids'].items():
                     nextGen.extend(val)
 
-            if decayTimer <= 1:
+            if decayTimer <= 1 and currentPop > endMaxPop:
                 decayTimer = rateOfDecay
                 currentPop -= decayAmount
             else:
                 decayTimer -= 1
-    print('Final generation = {}, Final generation size = {}, Final population max = {}'.format(g, len(nextGen), currentPop))
+    if generations == 0:
+        print('Final generation = {}, Final generation size = {}, Final population max = {}'.format(0, len(nextGen), currentPop))
+    else:
+        print('Final generation = {}, Final generation size = {}, Final population max = {}'.format(g, len(nextGen), currentPop))
     try:
         if args.output:
             outputData.to_csv(args.output, index=False)

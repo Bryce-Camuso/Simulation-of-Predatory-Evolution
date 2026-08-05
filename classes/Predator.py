@@ -25,11 +25,11 @@ class Predator(Animal):
         return round(6*math.log(self.get_stealth()/2)+7)  # https://www.desmos.com/calculator/cmxrds2z42
     
     def get_pursuit_range(self):
-        # https://www.desmos.com/calculator/yyp9owuqcz
-        if self.get_hunting_strategy == 'pursuit':
+        # https://www.desmos.com/calculator/ayoilzuwbl
+        if self.get_hunting_strategy() == 'pursuit':
             return round(self.speed_to_tiles() * 1.5)
         else:
-            return round(self.speed_to_tiles() / 1.5)
+            return round(self.speed_to_tiles() / 2)
     
 
     # Setters
@@ -254,35 +254,44 @@ class Predator(Animal):
 def tester():
     global debug
     debug = True
-    testPredator = Predator('ambush', 10, 40, 40, 40, 40, (42,35))
+    testPredatorA = Predator('ambush', 10, 50, 50, 50, 50, (42,35))
+    testPredatorP = Predator('pursuit', 10, 50, 50, 50, 50, (42,35))
     testPrey = Animal(40, 40, 40, 40, (45, 30))
     testMap = StaticMap()
 
      #getters 
     print('Getters')
 
-    if testPredator.get_hunting_strategy() == 'ambush':
+    if testPredatorA.get_hunting_strategy() == 'ambush':
             print('hunting strategy: pass')
     else:
         print('hunting strategy: fail')
 
-    if testPredator.get_evolution_chance() == 10:
+    if testPredatorA.get_evolution_chance() == 10:
         print('evolution chance: pass')
     else:
         print('evolution chance: fail')
 
-    if testPredator.get_ambush_range() == 16:
+    if testPredatorA.get_ambush_range() == 30:
         print('ambush range: pass')
     else:
         print('ambush range: fail')
+    if testPredatorP.get_pursuit_range() == 58:
+        print('pursuit range (pursuit): pass')
+    else:
+        print('pursuit range (pursuit): fail')
 
+    if testPredatorA.get_pursuit_range() == 20:
+        print('pursuit range (ambush): pass')
+    else:
+        print('pursuit range (ambush): fail')
     print('---------------------------------------------------------------------------------------------------------------------')
 
     #setters 
     print('Setters')
-    testPredator.set_evolution_chance(30)
-    if testPredator.get_evolution_chance() == 30:
-            print('evolution chance: pass')
+    testPredatorA.set_evolution_chance(30)
+    if testPredatorA.get_evolution_chance() == 30:
+        print('evolution chance: pass')
     else:
         print('evolution chance: fail')
 
@@ -293,7 +302,7 @@ def tester():
 
 
     try:
-        testPredator.set_evolution_chance(-1)
+        testPredatorA.set_evolution_chance(-1)
         print('Error: None')
     except ValueError:
         print('Error: correct')
@@ -301,7 +310,7 @@ def tester():
         print('Error: incorrect ')
 
     try:
-        testPredator.set_evolution_chance(101)
+        testPredatorA.set_evolution_chance(101)
         print('Error: None')
     except ValueError:
         print('Error: correct')
@@ -311,19 +320,19 @@ def tester():
     print('---------------------------------------------------------------------------------------------------------------------')
  
     print('Setters edge cases')
-    testPredator.set_evolution_chance(0)
-    if testPredator.get_evolution_chance() == 0:
+    testPredatorA.set_evolution_chance(0)
+    if testPredatorA.get_evolution_chance() == 0:
             print('evolution chance: pass')
     else:
         print('evolution chance: fail')
 
-    testPredator.set_evolution_chance(100)
-    if testPredator.get_evolution_chance() == 100:
+    testPredatorA.set_evolution_chance(100)
+    if testPredatorA.get_evolution_chance() == 100:
             print('evolution chance: pass')
     else:
         print('evolution chance: fail')
 
-    testPredator.set_evolution_chance(30)
+    testPredatorA.set_evolution_chance(30)
 
     print('---------------------------------------------------------------------------------------------------------------------')
     #methods 
@@ -336,8 +345,9 @@ def tester():
     # stuck on how to test a function with randomness built in.
 
 
-    testMoveList = testPredator.get_move_list(testPrey, testMap, 1)
-    exampleMoveList = [(1, (42, 35)), (2, (42, 34)), (3, (42, 33)), (4, (43, 33)), (5, (43, 32)), (6, (43, 31)), (7, (43, 30)), (9, (44, 30)), (10, (45, 30))]
+    testMoveList = testPredatorA.get_move_list(testPrey, testMap, 1)
+    exampleMoveList = [(42, 35), (42, 34), (42, 33), (43, 33), (43, 32), (43, 31), (43, 30), (44, 30), (45, 30)]
+    
     testFlag = False
     for i in range(len(exampleMoveList)):
         if exampleMoveList[i] == testMoveList[i]:
@@ -349,9 +359,10 @@ def tester():
         print('Move List: false')
 
     print('\nPhase 2 (Stalking) test')
-    testMoveList = testPredator.get_move_list(testPrey, testMap, 2)
-    exampleMoveList = [(1, (42, 35)), (2, (42, 34)), (3, (42, 33)), (4, (43, 33)), (5, (43, 32)), (6, (43, 31)), (7, (43, 30)), (9, (44, 30)), (10, (45, 30))]
+    testMoveList = testPredatorA.get_move_list(testPrey, testMap, 2)
+    exampleMoveList = [(42, 35), (42, 34), (42, 33), (43, 33), (43, 32), (43, 31), (43, 30), (44, 30), (45, 30)]
     testFlag = False
+    
     for i in range(len(exampleMoveList)):
         if exampleMoveList[i] == testMoveList[i]:
             testFlag = True
@@ -362,9 +373,10 @@ def tester():
         print('Move List: false')
 
     print('\nPhase 3 (pursuit) test')
-    testMoveList = testPredator.get_move_list(testPrey, testMap, 3)
-    exampleMoveList = [(1, (42, 35)), (2, (42, 36)), (3, (42, 37)), (4, (43, 37)), (5, (43, 38)), (6, (43, 39)), (7, (43, 40)), (8, (43, 41)), (10, (43, 42)), (11, (42, 42))]
+    testMoveList = testPredatorA.get_move_list(testPrey, testMap, 3)
+    exampleMoveList = [(42, 35), (42, 36), (42, 37), (43, 37), (43, 38), (43, 39), (43, 40), (43, 41), (43, 42), (42, 42)]
     testFlag = False
+    
     for i in range(len(exampleMoveList)):
         if exampleMoveList[i] == testMoveList[i]:
             testFlag = True
@@ -377,29 +389,29 @@ def tester():
     print('---------------------------------------------------------------------------------------------------------------------')
     print('Check ambush')
 
-    if testPredator.ambush_check((45, 30)):
+    if testPredatorA.ambush_check((45, 30)):
         print('ambush check: pass')
     else:
         print('ambush check: false')
 
     # check out of range
-    if not testPredator.ambush_check((145, 30)):
+    if not testPredatorA.ambush_check((145, 30)):
         print('ambush check: pass')
     else:
         print('ambush check: false')
 
     print('---------------------------------------------------------------------------------------------------------------------')
     print('Reproduction')
-    kids = testPredator.reproduction()
+    kids = testPredatorA.reproduction()
     parent = kids[0]
     kids = kids[1:]
-    if (parent.get_hunting_strategy() == testPredator.get_hunting_strategy() and parent.get_evolution_chance() == testPredator.get_evolution_chance()) and (parent.get_speed() == testPredator.get_speed() and parent.get_stealth() == testPredator.get_stealth() and parent.get_stamina() == testPredator.get_stamina() and parent.get_sense() == testPredator.get_sense()) and parent.get_position() == (0,0):
+    if (parent.get_hunting_strategy() == testPredatorA.get_hunting_strategy() and parent.get_evolution_chance() == testPredatorA.get_evolution_chance()) and (parent.get_speed() == testPredatorA.get_speed() and parent.get_stealth() == testPredatorA.get_stealth() and parent.get_stamina() == testPredatorA.get_stamina() and parent.get_sense() == testPredatorA.get_sense()) and parent.get_position() == (0,0):
         print('reproduction: pass')
     else:
         print('reproduction: false')
         
     for i in kids:
-        if (i.get_hunting_strategy() == testPredator.get_hunting_strategy() and i.get_evolution_chance() == testPredator.get_evolution_chance()) and (i.get_speed() != testPredator.get_speed() or i.get_stealth() != testPredator.get_stealth() or i.get_stamina() != testPredator.get_stamina() or i.get_sense() != testPredator.get_sense()) and i.get_position() == (0,0):
+        if (i.get_hunting_strategy() == testPredatorA.get_hunting_strategy() and i.get_evolution_chance() == testPredatorA.get_evolution_chance()) and (i.get_speed() != testPredatorA.get_speed() or i.get_stealth() != testPredatorA.get_stealth() or i.get_stamina() != testPredatorA.get_stamina() or i.get_sense() != testPredatorA.get_sense()) and i.get_position() == (0,0):
             print('reproduction: pass')
         else:
             print('reproduction: false')
