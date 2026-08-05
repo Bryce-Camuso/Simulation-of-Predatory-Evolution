@@ -12,9 +12,10 @@
 - **Semester:** Summer 2026
 - **Repository URL:** [github](https://github.com/Bryce-Camuso/Simulation-of-Predatory-Evolution)
 - **Current Branch:** Master
+- **Current Commit SHA:** 6b846f4
 - **Current Release Version:** 0.1
-- **Document Version:** 0.3
-- **Last Updated:** 2026-07-25
+- **Document Version:** 0.4
+- **Last Updated:** 2026-08-05
 
 ---
 
@@ -25,6 +26,7 @@
 | 0.1 | 2026-07-21 | test PRD | Initial PRD scaffold created from prompt structure. | Bryce Camuso |
 | 0.2 | 2026-07-21 | PRD update with prompts | Updated PRD based on repository evidence: predator-prey simulation with scent tracking, map-based navigation, and multiple animal types. | Bryce Camuso |
 | 0.3 | 2026-07-25 | PRD manual update | Updated PRD to better reflect the projects intentions that have not been reflected in code yet. | Bryce Camuso |
+| 0.4 | 2026-08-05 | 6b846f4 | Updated PRD to align scope, features, and testing with the current repository implementation. | Bryce Camuso |
 
 ---
 
@@ -59,13 +61,13 @@
 
 ## Problem Statement
 
-Simulate predator-prey ecosystem dynamics in a bounded 2D environment with statistically weighted decision making and hierarchical animal behaviors. The system must accurately model movement, sensing, pursuit, evasion, and energy management for multiple species.
+Provide a Python-based predator-prey simulation prototype that models animal movement, sensing, hunting, and energy management in a bounded 2D grid environment. The system should demonstrate map-based navigation, scent trail propagation, and strategy-driven predator/prey interactions.
 
 ## Intended Users
 
-- Students studying simulation systems and ecosystem modeling
-- Researchers investigating predator-prey dynamics
-- Educators demonstrating behavioral simulation concepts
+- Students studying simulation systems and agent-based behaviors
+- Educators demonstrating prototype ecosystem models
+- Developers exploring Python simulation design
 
 ## Stakeholders
 
@@ -75,28 +77,29 @@ Simulate predator-prey ecosystem dynamics in a bounded 2D environment with stati
 
 ## Product Goals
 
-- Implement a working predator-prey simulation with multiple animal types
-- Demonstrate statistically weighted decision making
-- Support configurable animal attributes (speed, stealth, stamina, sense, position, energy)
-- Generate CSV output for simulation results analysis
-- Provide unit test coverage for all major components
+- Implement a working predator-prey simulation prototype in Python
+- Support configurable animal attributes and class-based behaviors
+- Provide ambush and pursuit predator hunting strategies
+- Implement scent trail generation and decay for navigation
+- Enable command-line simulation execution with CSV export
+- Maintain inline component validation via tester functions
 
 ## Major Features
 
-- **Animal Class Hierarchy:** Base Animal class with specialized subclasses (Predator, Prey, Bird, Rabbit, Mouse)
-- **Map-Based Navigation:** Random grid-based environment with tile distribution (Plain, Tree, Bush)
-- **Scent System:** Dynamic scent trail generation, distribution, and decay over time
-- **Search Behaviors:** Two predator hunting strategies (Pursuit & Ambush)
-- **Movement Mechanics:** Position-based movement with distance calculations
-- **Energy Management:** Stamina and energy tracking for all animals
-- **CSV Data Export:** Simulation results exported to CSV format
-- **Unit Test Framework:** Comprehensive test suite for all classes
+- **Animal Class Hierarchy:** `Animal` base class with subclasses `Predator`, `Prey`, `Bird`, `Rabbit`, and `Mouse`
+- **Map-Based Environment:** `Map` class with random tile generation and `StaticMap` test helper
+- **Scent Trail System:** `Scent` class for scent generation, lookup, and decay
+- **Movement and Pathfinding:** Weight-based pathfinding and movement across grid tiles
+- **Predator Hunting Strategies:** Ambush and pursuit modes with range and stalking logic
+- **Prey Behavior:** Escape behavior and type-specific checks for rabbit and bird
+- **CSV Output:** Export simulation results using `pandas`
+- **Tester Functions:** Inline `tester()` methods in modules for component verification
 
 ## Planned Software Versions
 
-- **Version 0.1:** Initial class structure and basic functionality (current)
-- **Version 1.0:** Fully functional base simulation with one prey type and one predator type
-- **Version 2.0:** Fully functional base simulation with three prey types and two predator types
+- **Version 0.1:** Current prototype with animal classes, map, scent system, and simulation drivers
+- **Version 1.0:** Expanded validation and more complete behavior coverage
+- **Version 2.0:** Additional species, richer behaviors, and enhanced analysis support
 
 ---
 
@@ -104,30 +107,32 @@ Simulate predator-prey ecosystem dynamics in a bounded 2D environment with stati
 
 ## Included Functionality
 
-- Predator and prey animal classes with configurable attributes
-- 2D map grid with tile types and distribution
-- Scent trail system with decay mechanics
-- Multiple search and movement strategies
-- Animal getter/setter methods for attribute access
-- Unit tests for individual classes and behaviors
-- CSV output export for simulation results
-- Evolutionary trait tracking
+- Animal class hierarchy with attribute management in `classes/Animal.py`, `classes/Predator.py`, and `classes/Prey.py`
+- Specialized prey classes `Bird`, `Rabbit`, and `Mouse` with type-specific behavior hooks
+- `Map` generation and tile access methods in `classes/Map.py`
+- `StaticMap` test helper for deterministic map access in validation code
+- Scent trail generation, lookup, and decay logic in `classes/Scent.py`
+- Pathfinding and weight-based movement decision functions for animals
+- Predator hunting strategy logic for ambush and pursuit
+- Rabbit escape check based on bush tiles and bird in-air state tracking
+- Command-line simulation drivers (`simulation-test.py`, `simulation-v1.py`) with CSV export
+- Inline module tester functions for manual component verification
 
 ## Excluded Functionality
 
-- GUI or graphical visualization (planned for future version)
-- Real-time parameter tuning during simulation
-- Machine learning or AI optimization
-- Network multiplayer capabilities
-- Persistent data storage beyond CSV files
+- GUI or graphical visualization layer
+- Formal automated unit test framework or test runner
+- Networked or distributed simulation execution
+- Persistent database storage beyond CSV files
+- Realtime interactive simulation control beyond command-line arguments
 
 ## Future Enhancements
 
-- Graphical user interface (PyGame or similar)
-- Advanced scent diffusion algorithms
-- Additional animal species and behaviors
-- Environmental hazards and obstacles
-- Performance profiling and optimization
+- Formal automated test harness and coverage reporting
+- Additional predator and prey species with richer behaviors
+- Improved simulation configuration and runtime parameter tuning
+- Environment hazards, obstacles, and weather impact modeling
+- Performance optimization for larger population sizes
 
 ---
 
@@ -371,42 +376,41 @@ The capabilities below reflect the current prototype implementation and its plan
 
 | Category | Requirement |
 |----------|-------------|
-| **Performance** | The simulation shall update all animals and scent trails in less than 100 ms per tick on standard hardware. |
-| **Reliability** | All animals shall maintain valid state (within map, positive stamina) throughout simulation. |
-| **Availability** | The system shall complete a full simulation run without crashes or unexplained terminations. |
-| **Maintainability** | All classes shall have single responsibility and be independently testable. |
-| **Scalability** | The system shall support simulation of up to 100 animals without performance degradation. |
-| **Usability** | Test output shall clearly indicate pass/fail status with detailed error messages. |
-| **Security** | File I/O operations shall validate file paths and handle permission errors gracefully. |
-| **Portability** | The system shall run on Python 3.14.4 across Windows, macOS, and Linux. |
-| **Interoperability** | CSV output shall be readable by standard spreadsheet and data analysis tools. |
-| **Testability** | All public methods shall be unit testable; test suite shall achieve >80% code coverage. |
+| **Performance** | The prototype shall complete small simulation runs without unreasonable delay on standard hardware. |
+| **Reliability** | Animals shall maintain valid state (within map bounds, non-negative energy) throughout execution. |
+| **Availability** | The code shall run without unexpected crashes for supported command-line scenarios. |
+| **Maintainability** | Classes shall be organized by responsibility and support direct inspection through tester functions. |
+| **Scalability** | The implementation shall support the current prototype workload; larger population scaling is future work. |
+| **Usability** | Command-line behavior and tester output shall be clear and readable. |
+| **Security** | File I/O operations shall avoid unhandled exceptions and report permission errors. |
+| **Portability** | The prototype shall run on Python 3.14.4 and use standard Python libraries where possible. |
+| **Interoperability** | CSV output shall remain readable by standard spreadsheet tools. |
+| **Testability** | Public class methods shall be callable from the inline tester functions; formal coverage metrics are To Be Completed. |
 
 ---
 
 # 10. Performance Requirements
 
-| Requirement | Target |
+| Requirement | Status |
 |-------------|--------|
-| Simulation tick update time | < 100 ms for 10 animals |
-| CSV export time | < 500 ms for 10,000 records |
-| Memory usage per animal | < 1 MB |
-| Maximum concurrent animals | 100+ without performance degradation |
-| Scent trail decay computation | < 50 ms per tick |
-| Position calculation latency | < 5 ms per movement |
+| Simulation runtime for small test scenario | To Be Completed |
+| CSV export performance for production data | To Be Completed |
+| Memory usage per animal | To Be Completed |
+| Maximum concurrent animals | To Be Completed |
+| Scent trail decay computation | To Be Completed |
+| Position calculation latency | To Be Completed |
 
 ---
 
 # 11. Assumptions
 
 - Python 3.14.4 is available on the development and test machines.
-- The map is a finite 2D bounded grid with fixed dimensions.
-- Animals move in discrete time steps (ticks).
-- Scent decays uniformly across all directions from the source.
-- Predators have perfect information about prey location once scent is detected.
-- Energy and stamina are the only factors affecting animal movement capability.
-- Simulation terminates when all prey are caught or maximum time steps reached.
-- All test cases are deterministic and repeatable.
+- The map is a finite 2D bounded grid with fixed dimensions in the current prototype.
+- Animals move in discrete steps driven by pathfinding and decision logic.
+- Scent is represented as a decaying trail over discrete grid locations.
+- Energy and stamina are the primary state variables affecting animal movement.
+- Simulation termination is driven by prey escape, prey capture, or exhaustion conditions in the current code.
+- Current validation is based on inline module tester functions rather than a formal test harness.
 
 ---
 
@@ -416,13 +420,13 @@ The capabilities below reflect the current prototype implementation and its plan
 |------------|-------|
 | **Programming Language** | Python 3.14.4 |
 | **Operating System** | Windows, macOS, Linux |
-| **Required Libraries** | random (stdlib), math (stdlib), heapq (stdlib) |
+| **Required Libraries** | random, math, heapq, argparse, concurrent.futures, pandas |
 | **Framework** | None (pure Python) |
 | **Database** | CSV file format (no database engine) |
 | **Hardware** | Standard developer workstation with 4+ GB RAM |
 | **External APIs** | None required |
-| **Map Grid Size** | To Be Completed (configurable) |
-| **Maximum Simulation Ticks** | To Be Completed (configurable) |
+| **Map Grid Size** | 301 × 301 points (0 through 300) for `Map` |
+| **Maximum Simulation Ticks** | To Be Completed |
 
 ---
 
@@ -440,7 +444,8 @@ The capabilities below reflect the current prototype implementation and its plan
 
 ## Software Interfaces
 
-- Python standard library: random, math, heapq
+- Python standard library: random, math, heapq, argparse, concurrent.futures
+- Third-party library: pandas
 - CSV file system interface
 - File I/O for data export
 

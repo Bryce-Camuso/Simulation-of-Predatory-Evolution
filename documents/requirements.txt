@@ -1,0 +1,234 @@
+Requirements Summary for Predator-Prey Simulation System
+
+This file consolidates the requirements and risk information from the project's
+Product Requirements Document (PRD.md). It includes: Undesirable Events,
+Risk Analysis, Risk Prioritization, Risk Mitigation, Functional Requirements,
+Quality Requirements, Performance Requirements, and the Requirements
+Traceability Matrix. No requirements are invented; all items below are taken
+directly from PRD.md.
+
+---
+
+1) Undesirable Events (UE)
+
+UE-1.1-01: Animal created with invalid or missing attributes
+UE-1.2-01: Attribute update causes inconsistent animal state
+UE-1.3-01: Animal moves outside map boundaries
+UE-1.4-01: Incorrect search strategy selected for animal type
+UE-2.1-01: Map contains invalid or unbalanced tile distribution
+UE-2.2-01: Position tracking diverges from actual animal location
+UE-2.3-01: Movement constraints not applied correctly
+UE-2.4-01: Prey item not properly integrated with map
+UE-3.1-01: Scent trail initialized with incorrect parameters
+UE-3.2-01: Scent trail updates are inconsistent or delayed
+UE-3.3-01: Scent decay does not follow specified decay model
+UE-3.4-01: Incorrect scent values returned for location
+UE-4.1-01: Predator does not locate prey using search strategy
+UE-4.2-01: Stalking behavior fails to track prey movement
+UE-4.3-01: Pursuit fails to catch prey despite proximity
+UE-4.4-01: Catch determination uses incorrect criteria
+UE-5.1-01: Stamina consumption does not match movement distance
+UE-5.2-01: Energy changes not properly tracked
+UE-5.3-01: Energy depletion not detected when stamina expires
+UE-5.4-01: Stamina update fails or produces negative values
+UE-6.1-01: CSV file not created or is corrupted
+UE-6.2-01: Data formatted incorrectly in output
+UE-6.3-01: Data records not written to output file
+UE-7.1-01: Simulation environment not properly initialized
+UE-7.2-01: Simulation loop terminates prematurely
+UE-7.3-01: Test validation produces false positives or negatives
+UE-7.4-01: Batch test suite fails to execute all tests
+
+---
+
+2) Risk Analysis (selected fields from PRD)
+
+UE ID | Likelihood | Impact | Risk Score
+UE-1.1-01 | 3 | 4 | 12
+UE-1.2-01 | 2 | 4 | 8
+UE-1.3-01 | 3 | 4 | 12
+UE-1.4-01 | 2 | 4 | 8
+UE-2.1-01 | 2 | 3 | 6
+UE-2.2-01 | 3 | 3 | 9
+UE-2.3-01 | 3 | 3 | 9
+UE-2.4-01 | 2 | 4 | 8
+UE-3.1-01 | 2 | 3 | 6
+UE-3.2-01 | 3 | 3 | 9
+UE-3.3-01 | 3 | 4 | 12
+UE-3.4-01 | 3 | 4 | 12
+UE-4.1-01 | 4 | 4 | 16
+UE-4.2-01 | 4 | 4 | 16
+UE-4.3-01 | 4 | 4 | 16
+UE-4.4-01 | 3 | 4 | 12
+UE-5.1-01 | 2 | 3 | 6
+UE-5.2-01 | 3 | 3 | 9
+UE-5.3-01 | 2 | 3 | 6
+UE-5.4-01 | 2 | 3 | 6
+UE-6.1-01 | 2 | 3 | 6
+UE-6.2-01 | 2 | 2 | 4
+UE-6.3-01 | 2 | 3 | 6
+UE-7.1-01 | 2 | 4 | 8
+UE-7.2-01 | 2 | 3 | 6
+UE-7.3-01 | 3 | 4 | 12
+UE-7.4-01 | 2 | 3 | 6
+
+---
+
+3) Risk Prioritization (ordered by PRD)
+
+Priority 1: UE-4.1-01 (Risk Score 16)
+Priority 2: UE-4.2-01 (Risk Score 16)
+Priority 3: UE-4.3-01 (Risk Score 16)
+Priority 4: UE-1.1-01 (Risk Score 12)
+Priority 5: UE-1.3-01 (Risk Score 12)
+Priority 6: UE-3.3-01 (Risk Score 12)
+Priority 7: UE-3.4-01 (Risk Score 12)
+Priority 8: UE-4.4-01 (Risk Score 12)
+Priority 9: UE-7.3-01 (Risk Score 12)
+Priority 10: UE-1.2-01 (Risk Score 8)
+Priority 11: UE-1.4-01 (Risk Score 8)
+Priority 12: UE-2.4-01 (Risk Score 8)
+Priority 13: UE-7.1-01 (Risk Score 8)
+Priority 14: UE-2.2-01 (Risk Score 9)
+Priority 15: UE-2.3-01 (Risk Score 9)
+Priority 16: UE-3.2-01 (Risk Score 9)
+Priority 17: UE-5.2-01 (Risk Score 9)
+Priority 18: UE-2.1-01 (Risk Score 6)
+Priority 19: UE-3.1-01 (Risk Score 6)
+Priority 20: UE-5.1-01 (Risk Score 6)
+Priority 21: UE-5.3-01 (Risk Score 6)
+Priority 22: UE-5.4-01 (Risk Score 6)
+Priority 23: UE-6.1-01 (Risk Score 6)
+Priority 24: UE-6.3-01 (Risk Score 6)
+Priority 25: UE-7.2-01 (Risk Score 6)
+Priority 26: UE-7.4-01 (Risk Score 6)
+Priority 27: UE-6.2-01 (Risk Score 4)
+
+---
+
+4) Risk Mitigation (from PRD)
+
+UE-1.1-01: Implement constructor validation and unit tests for all animal types.
+UE-1.2-01: Use property setters with validation; maintain invariant checks.
+UE-1.3-01: Enforce boundary checking before and after movement calculations.
+UE-1.4-01: Document search strategy selection logic; add unit tests for each type.
+UE-2.1-01: Validate map structure during initialization and log tile distribution.
+UE-2.2-01: Implement position getter/setter with assertions; log position changes.
+UE-2.3-01: Document movement constraints; validate before movement execution.
+UE-2.4-01: Test prey integration with scent system; verify correct initialization.
+UE-3.1-01: Implement scent constructor with parameter validation and defaults.
+UE-3.2-01: Document scent update algorithm; verify decay mechanics in unit tests.
+UE-3.3-01: Use configurable decay rate; validate through unit tests and simulation.
+UE-3.4-01: Implement getter with boundary checks; test across all map locations.
+UE-4.1-01: Implement search algorithm with unit tests; verify behavior in simulation.
+UE-4.2-01: Implement stalking algorithm; test predator-prey interaction.
+UE-4.3-01: Implement pursuit algorithm; test catch distance calculation.
+UE-4.4-01: Document catch criteria; verify through simulation testing.
+UE-5.1-01: Document stamina formula; verify calculations in unit tests.
+UE-5.2-01: Implement energy tracking with getters/setters; log changes during simulation.
+UE-5.3-01: Implement depletion check; trigger state change when stamina < threshold.
+UE-5.4-01: Use saturating arithmetic; prevent negative stamina values.
+UE-6.1-01: Implement CSV writer with error handling; verify file creation.
+UE-6.2-01: Validate CSV format against test cases; verify field delimiters.
+UE-6.3-01: Implement write operations with error checking; log write failures.
+UE-7.1-01: Implement initialization checklist; verify all components ready before simulation.
+UE-7.2-01: Implement simulation loop with termination conditions; set maximum iterations.
+UE-7.3-01: Define validation criteria explicitly; review test cases before execution.
+UE-7.4-01: Implement batch runner to execute all tests; report pass/fail for each.
+
+---
+
+5) Functional Requirements (FR)
+
+FR-1.1.1: Initialize each prototype animal with required attributes in the constructor.
+FR-1.2.1: Provide getter/setter methods with validation.
+FR-1.3.1: Calculate a new position based on speed, direction, and map constraints.
+FR-1.4.1: Select the appropriate search strategy for the active predator-prey prototype.
+FR-2.1.1: Create a 2D grid with configurable tile types.
+FR-2.2.1: Maintain and update (x, y) coordinates.
+FR-2.3.1: Enforce map boundary checks.
+FR-2.4.1: Instantiate prey-oriented prototype entities for simulation use.
+FR-3.1.1: Initialize Scent with decay rate and intensity.
+FR-3.2.1: Update scent distribution each tick.
+FR-3.3.1: Reduce intensity by percentage per distance.
+FR-3.4.1: Return scent value at any location.
+FR-4.1.1: Implement scent trail following.
+FR-4.2.1: Track prey movement within sense range.
+FR-4.3.1: Calculate path to prey and close distance.
+FR-4.4.1: Detect when predator and prey occupy same location.
+FR-5.1.1: Decrement stamina based on distance moved and terrain type.
+FR-5.2.1: Update energy after each animal action.
+FR-5.3-01: Identify when stamina reaches zero and trigger animal inactivity.
+FR-5.4.1: Maintain positive stamina value.
+FR-6.1.1: Write simulation results to CSV file with proper headers.
+FR-6.2.1: Ensure proper field delimiters and formatting.
+FR-6.3.1: Append each simulation result as a new row.
+FR-7.1.1: Create and verify all components during initialization.
+FR-7.2.1: Execute the main loop for each tick updating entities.
+FR-7.3.1: Compare expected vs. actual test outcomes and report pass/fail.
+FR-7.4.1: Execute all test files and collect results for reporting.
+
+---
+
+6) Quality Requirements (as stated in PRD)
+
+- Performance: Prototype shall complete small simulation runs without unreasonable delay on standard hardware.
+- Reliability: Animals shall maintain valid state (within map bounds, non-negative energy) throughout execution.
+- Availability: Code shall run without unexpected crashes for supported command-line scenarios.
+- Maintainability: Classes shall be organized by responsibility and support direct inspection through tester functions.
+- Scalability: Implementation shall support the current prototype workload; larger population scaling is future work.
+- Usability: Command-line behavior and tester output shall be clear and readable.
+- Security: File I/O operations shall avoid unhandled exceptions and report permission errors.
+- Portability: Prototype shall run on Python 3.14.4 and use standard Python libraries where possible.
+- Interoperability: CSV output shall remain readable by standard spreadsheet tools.
+- Testability: Public class methods shall be callable from the inline tester functions.
+
+---
+
+7) Performance Requirements (PRD marked these as To Be Completed)
+
+The PRD lists performance-related items but marks them "To Be Completed":
+- Simulation runtime for small test scenario
+- CSV export performance for production data
+- Memory usage per animal
+- Maximum concurrent animals
+- Scent trail decay computation
+- Position calculation latency
+
+These items remain placeholders in the PRD and should be specified when performance targets are defined.
+
+---
+
+8) Requirements Traceability Matrix (concise mapping)
+
+FR-1.1.1 -> Level-2 Capability: Initialize Animal with Attributes
+FR-1.2.1 -> Level-2 Capability: Update Animal Attributes
+FR-1.3.1 -> Level-2 Capability: Execute Animal Movement
+FR-1.4.1 -> Level-2 Capability: Determine Animal Search Behavior
+FR-2.1.1 -> Level-2 Capability: Define Map Structure and Tile Types
+FR-2.2.1 -> Level-2 Capability: Track Animal Position
+FR-2.3.1 -> Level-2 Capability: Calculate Movement Constraints
+FR-2.4.1 -> Level-2 Capability: Build Prey Item Class
+FR-3.1.1 -> Level-2 Capability: Create and Initialize Scent Trail
+FR-3.2.1 -> Level-2 Capability: Update Scent Trail Over Time
+FR-3.3.1 -> Level-2 Capability: Decay Scent at Specified Rate
+FR-3.4.1 -> Level-2 Capability: Retrieve Scent Values
+FR-4.1.1 -> Level-2 Capability: Execute Search Behavior
+FR-4.2.1 -> Level-2 Capability: Execute Stalking Behavior
+FR-4.3.1 -> Level-2 Capability: Execute Pursuit Behavior
+FR-4.4.1 -> Level-2 Capability: Determine Predator Catch Success
+FR-5.1.1 -> Level-2 Capability: Calculate Stamina Consumption
+FR-5.2.1 -> Level-2 Capability: Track Energy Level Changes
+FR-5.3.1 -> Level-2 Capability: Detect Energy Depletion
+FR-5.4.1 -> Level-2 Capability: Update Remaining Stamina
+FR-6.1.1 -> Level-2 Capability: Export Simulation Data to CSV
+FR-6.2.1 -> Level-2 Capability: Format Output Data Correctly
+FR-6.3.1 -> Level-2 Capability: Write Data Records
+FR-7.1.1 -> Level-2 Capability: Initialize Simulation Environment
+FR-7.2.1 -> Level-2 Capability: Run Simulation Loop
+FR-7.3.1 -> Level-2 Capability: Validate Test Results
+FR-7.4.1 -> Level-2 Capability: Execute Batch Test Suite
+
+---
+
+Document created from PRD.md sections.

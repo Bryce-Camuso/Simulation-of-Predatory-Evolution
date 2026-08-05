@@ -5,50 +5,45 @@
 **Course:** CISC 699
 **Semester:** Summer 2026
 **Repository URL:** [github](https://github.com/Bryce-Camuso/Simulation-of-Predatory-Evolution)
-**Current branch:** Sim/Siv-v1
-**Document version:** 0.1
+**Current branch:** To Be Completed
+**Document version:** 0.2
 **Document status:** Draft
-**Last updated:** 2026-07-28
-**Primary test frameworks / artifacts:** None (ad-hoc Python tester functions and simulation driver)
+**Last updated:** 2026-08-05
+**Primary test frameworks / artifacts:** None (ad-hoc `tester()` functions inside class modules and simulation drivers)
  
 ---
 
-# Test execution summary (runs performed 2026-07-28)
+# Test execution summary (runs performed 2026-08-05)
 
-I executed the in-repo class-level testers and the `simulation-test.py` driver from the repository root and captured console outputs. Runs were limited to normal completion (no artificial time limits beyond 120s). The following is a concise, evidence-based summary.
+I ran the in-repo class-level tester scripts located in the `classes/` folder from the repository root using the workspace Python interpreter. Runs were executed synchronously and outputs were captured from the terminal. Below are the observed outcomes and brief evidence notes copied from the captured console output.
 
 | Artifact run | Outcome | Notes / evidence |
 |--------------|---------|------------------|
 | `classes/Map.py` | PASS | All Map tester checks printed `pass` (Map Size, Tile Distribution, Getters, Singleton).
-| `classes/Scent.py` | PASS | All scent-trail length checks, add/update/decay checks printed `pass`.
-| `classes/Plant.py` | PASS | Getters, setters, and `update_scent_trail()` printed `pass`.
-| `classes/Animal.py` (`auto`) | PASS | Getters/setters, scent update, search, scent decay, and pathfinding printed `pass` (Energy use reported `false` where code prints that). Evidence: console output captured.
-| `classes/Prey.py` | PASS | All Prey tester checks printed `pass` (getters, setters, get_move_list phases, struggle).
-| `classes/Predator.py` | PASS | All Predator tester checks printed `pass` (getters, setters, get_move_list phases, ambush, reproduction).
-| `classes/Bird.py` | PASS | Bird class tester printed `pathfinding check: pass` and other checks passed.
-| `classes/Rabbit.py` | PASS | Rabbit tester printed `check_escape: pass`.
-| `simulation-test.py` | PASS (integration) | Ran until predator caught prey; sample moves printed and `Predator caught prey` observed. Sample output:
+| `classes/Scent.py` | PASS | Scent trail get/add/update/decay checks printed `pass` for multiple levels.
+| `classes/Plant.py` | PASS | Getters, setters, and `Update Scent Trail` printed `pass`.
+| `classes/Animal.py` | PASS | Getters/setters, scent update, search, scent decay, energy use, and pathfinding printed `pass`.
+| `classes/Prey.py` | PASS | Getter/setter, move-phase tests, and struggle printed `pass`.
+| `classes/Predator.py` | PARTIAL (1 failure) | Most checks passed; `ambush range` test printed `fail` (see console output in appendix).
+| `classes/Bird.py` | PASS | Getters/setters and `pathfinding check: pass` observed.
+| `classes/Rabbit.py` | PASS | `check_escape: pass` observed.
 
-```
-prey move: (20, 26)
-pred move: (37, 44)
-prey move: (9, 20)
-pred move: (26, 37)
-prey move: (9, 9)
-pred move: (21, 26)
-prey move: (11, 10)
-pred move: (11, 17)
-prey move: (10, 9)
-pred move: (10, 9)
-Predator caught prey
-```
+
+Execution notes:
+- All scripts were executed from the repository root using the configured Python executable for the workspace.
+- `classes/Predator.py` produced a failing check for `ambush range` which should be investigated; other Predator tests passed.
+- Two modules (`Mouse.py`, `StaticMap.py`) produced no output; they either lack `tester()` functions or their `__main__` sections do not print results.
+
+Recorded terminal outputs are available in the terminal session. Where tests printed `pass` or `fail`, those strings were captured directly from the modules' tester outputs.
 
 ---
 
 ## Effects on previous status fields
 
-- Execution status for many class-level testers is now `Completed` with pass/fail evidence above. Where errors occurred during tests, the status is `Partial / Error` and includes the captured traceback.
-- `CI/CD status` remains `To Be Completed` (no CI was added and runs were manual local runs).
+- Execution status for most class-level testers is now `Completed` with captured `pass` outputs as recorded above.
+- `classes/Predator.py` is `Partial` due to one failing check (`ambush range: fail`).
+- `classes/Mouse.py` and `classes/StaticMap.py` produced no tester output and are marked `To Be Completed` (no evidence of tester execution in those modules).
+- `CI/CD status` remains `To Be Completed` (no CI configuration present in the repository).
 
 ---
 
