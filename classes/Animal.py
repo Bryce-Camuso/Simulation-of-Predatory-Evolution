@@ -1,5 +1,5 @@
-from Scent import Scent
-from StaticMap import StaticMap
+from .Scent import Scent
+from .StaticMap import StaticMap
 import heapq
 import math
 class Animal:
@@ -106,48 +106,39 @@ class Animal:
 
 
 
-    # Helper functions
+    # Helper functions 
+    def _left_search(self, x, y, endLevel):
+        returnArray = []
+        if x >= 0 and y >= 0:
+            returnArray.append((x, y))
 
-    def _search_top(self, position, level, endLevel):
-        #adds current position to array. Recursively searchs positions above it
-        if level > endLevel or (position[0] < 0 or position[1] < 0):
-            return []
-
-        returnArray = [position]
-        returnArray.extend(self._search_top((position[0], position[1] + 1), level + 1, endLevel))
+        for i in range(1,endLevel + 1):
+            x += 1
+            if x >= 0:
+                if i != endLevel and y >= 0:
+                    returnArray.append((x, y))
+                for t in range(1, i + 1):
+                    if y + t >= 0:
+                        returnArray.append((x, y + t))
+                    if y - t >= 0:
+                        returnArray.append((x, y - t))
         return returnArray
 
-    def _search_right(self, position, level, endLevel):
-        #adds current position to array. Recursively searchs positions above, to it's right, and under it
-        if level > endLevel or (position[0] < 0 or position[1] < 0):
-            return []
+    def _right_search(self, x, y, endLevel):
+        returnArray = []
+        if x >= 0 and y >= 0:
+            returnArray.append((x, y))
 
-        returnArray = [position]
-        returnArray.extend(self._search_top((position[0], position[1] + 1), level + 1,  endLevel))
-        returnArray.extend(self._search_right((position[0] + 1, position[1]), level + 1,  endLevel))
-        returnArray.extend(self._search_bottom((position[0], position[1] - 1), level + 1,  endLevel))
-        return returnArray
-
-    def _search_bottom(self, position, level, endLevel):
-        #adds current position to array. Recursively searchs positions under it
-        if level > endLevel or (position[0] < 0 or position[1] < 0):
-            return []
-
-        returnArray = [position]
-        returnArray.extend(self._search_bottom((position[0], position[1] - 1), level + 1,  endLevel))
-
-        return returnArray
-
-    def _search_left(self, position, level, endLevel):
-        #adds current position to array. Recursively searchs positions above, to it's left, and under it
-        if level > endLevel or (position[0] < 0 or position[1] < 0):
-            return []
-
-        returnArray = [position]
-        returnArray.extend(self._search_top((position[0], position[1] + 1), level + 1,  endLevel))
-        returnArray.extend(self._search_left((position[0] - 1, position[1]), level + 1,  endLevel))
-        returnArray.extend(self._search_bottom((position[0], position[1] - 1), level + 1,  endLevel))
-
+        for i in range(1,endLevel):
+            x -= 1
+            if x > 0:
+                if y >= 0:
+                    returnArray.append((x, y))
+                for t in range(1, i + 1):
+                    if y + t >= 0:
+                        returnArray.append((x, y + t))
+                    if y - t >= 0:
+                        returnArray.append((x, y - t))
         return returnArray
     
     def _cellWeight(self, point, map):
@@ -161,6 +152,10 @@ class Animal:
 
     def _distance(self, point1, point2):
         return abs(point1[0] - point2[0]) + abs(point1[1] - point2[1])
+
+
+    def _scent_list_lookup_builder(self, scentList):
+        return {cords: (i + 1) * 5 for i, s in enumerate(scentList) for cords in s}
 
     def _path_trace(self, targetTile, parents):
         path = []
@@ -176,18 +171,14 @@ class Animal:
 
     # Methods
     def speed_to_tiles(self):
-        # graph https://www.desmos.com/calculator/jtn1acpevr
-        return round(9*math.log(self.get_speed()/2)+10)
+        # graph https://www.desmos.com/calculator/tbzv6jkp9l
+        return round(7*math.log(self.get_speed()/2)+8)
 
     
     def search(self, endLevel):
-        #add in negative check
-        position = self.get_position()
-        returnArray = []
-        returnArray.extend(self._search_top((position[0], position[1] + 1), 1, endLevel))
-        returnArray.extend(self._search_right((position[0] + 1, position[1]), 1, endLevel))
-        returnArray.extend(self._search_bottom((position[0], position[1] - 1), 1, endLevel))
-        returnArray.extend(self._search_left((position[0] - 1, position[1]), 1, endLevel))
+        x,y = self.get_position()[0], self.get_position()[1]
+        returnArray = self._left_search(x - endLevel, y, endLevel)
+        returnArray.extend(self._right_search(x + endLevel, y, endLevel))
         return returnArray
 
     def energy_used(self):
@@ -225,8 +216,8 @@ class Animal:
         mapPointList = {}
         searchedList = set()
         foundTile = False
-        # added a queue cut off to help speed up searching while not losing two many paths. Maximum queue size from testing sits around 90 while 70 only cuts out about 1 tile fromt the final path.
-        while len(queue) > 0 and len(queue) < 70 and  not foundTile:
+        # added a queue cut off to help speed up searching while not losing two many paths.
+        while len(queue) > 0 and len(queue) < 50 and  not foundTile:
             p = heapq.heappop(queue)[1]
 
             if p not in searchedList and bestG[p] < speedToTiles:

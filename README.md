@@ -9,6 +9,7 @@
 | csv                | Holds the data files from testing/final output                                      |
 | documents          | Holds the documents related to the final theisis                                    |
 | documents/archived | Holds the documents compleated throughout the project and related class submissions |
+| simulation         | Holds the old or test simulations                                                   |
 
 ## Project Dependencies
 
@@ -46,12 +47,12 @@ e.g. **python classes/Scent.py** to run the Scent class tester.
 
 The simulation built in this project has been split into 4 diffrent versions for diffrent purposes. The table below contains the simulation version, it's file location, and the purposes. To run any of the simulations they **MUST BE IN THE HOME DIRECTORY** of the project. Note some versions of the simulation may require comand line arguments to be passed in. These are noted in the section [File Comand Line Arguments](#file-comand-line-arguments) section.
 
-| File               | File Location      | Purpose                                                                           |
-|--------------------|--------------------|-----------------------------------------------------------------------------------|
-| simulation-test.py | documents/archived | This file is used to test the simulation to get detailed data on what happend at each phase of the simulation. |
-| simulation-demo.py | documents/archived | This file acts as a demo for the project. It runs a small scale version of the simulation to show working status and sample outputs.|
-| simulation-v1.py   | documents/archived | This file acts as the first version of the full simulation. It is used to run one on one testing with predators and prey. |
-| simulation-v2.py   | home               | This file is the final version of the simulation. It runs all three prey items against a mix population of ambush and pursuit predators|
+| File               | File Location | Purpose                                                                                                                                |
+|--------------------|---------------|----------------------------------------------------------------------------------------------------------------------------------------|
+| simulation-test.py | simulation    | This file is used to test the simulation to get detailed data on what happend at each phase of the simulation.                         |
+| simulation-demo.py | simulation    | This file acts as a demo for the project. It runs a small scale version of the simulation to show working status and sample outputs.   |
+| simulation-v1.py   | simulation    | This file acts as the first version of the full simulation. It is used to run one on one testing with predators and prey.              |
+| simulation-v2.py   | home          | This file is the final version of the simulation. It runs all three prey items against a mix population of ambush and pursuit predators|
 
 ## File Comand Line Arguments
 
@@ -92,3 +93,14 @@ Comand line: **python simulation-v1.py \<predatorType\> \<preyType\> [-o file pa
 | ending max          | -em              | --endingMax          | 500               | int >= 1                | Sets the maximum for population size at the end (how many predators are allowed in the final generation) |
 
 
+### simulation-v2
+
+Comand line: **python simulation-v1.py \<predatorType\> \<preyType\> [-o file path] [-sp int] [-g int] [-sm int] [-em int]**
+
+| name                | flag or position | extended flag        | defult value      | valid arguments         | description                                                     |
+|---------------------|------------------|----------------------|-------------------|-------------------------|-----------------------------------------------------------------|
+| output              | -o               | --output             | csv/output.csv    | Valid file path         | Redirects the standard output into the designated file location |
+| starting population | -sp              | --startingPopulation | 10000             | int >= 1                | Sets the starting population size (how many predators are in generation 0) |
+| generation          | -g               | --generation         | 1000              | int >= 0                | Sets how many generations the simulation will go through |
+| starting max        | -sm              | --startingMax        | 5000              | int >= 1                | Sets the maximum for population size at the start (how many predators are allowed after generation 0) |
+| ending max          | -em              | --endingMax          | 500               | int >= 1                | Sets the maximum for population size at the end (how many predators are allowed in the final generation) |

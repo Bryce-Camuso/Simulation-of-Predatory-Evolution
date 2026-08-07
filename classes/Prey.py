@@ -1,7 +1,7 @@
-from Animal import Animal
-from Plant import Plant
+from .Animal import Animal
+from .Plant import Plant
 import random
-from StaticMap import StaticMap
+from .StaticMap import StaticMap
 
 global debug
 debug = False
@@ -48,58 +48,43 @@ class Prey(Animal):
             return 50
     
     
-    def _scent_list_lookup_builder(self, scentList):
-        scent_lookup = {}
-        scentStrength = 100
-        for i in range(len(scentList)):
-            scent_lookup.update(dict.fromkeys(scentList[-1*(i+1)], scentStrength))
-            scentStrength -= 5
-        return scent_lookup
+    
 
     
     def _searching_weight(self, tile, flowerScentLookup, targetPos, movementNoise, midpoint):
         global debug
-        tileWeight = self._searching_tile_weight(tile[1])
-        if tile[0] in flowerScentLookup:
-            scentWeigthFlower = flowerScentLookup[tile[0]]
-        else:
-            scentWeigthFlower = 0
-        midpush = self._distance((midpoint,midpoint), tile[0]) // 20 # this was added to help push both animals towards the middle of the map for more consistant interactions.
+        tilePos, tileType = tile
+        tileWeight = self._searching_tile_weight(tileType)
+        scentWeigthFlower = flowerScentLookup.get(tilePos,0)
+        midpush = self._distance((midpoint,midpoint), tilePos) // 20 # this was added to help push both animals towards the middle of the map for more consistant interactions.
         #movementNoise = random.randint(-5,5)
 
 
         if debug:
             movementNoise = 0
-        if tile[0] == targetPos: target = 100
+        if tilePos == targetPos: target = 100
         else: target = 0
-        return (tile[0],  (tileWeight + scentWeigthFlower + movementNoise + target - midpush))
+        return (tilePos,  (tileWeight + scentWeigthFlower + movementNoise + target - midpush))
     
     def _stalking_weight(self, tile, predatorScentLookup, flowerScentLookup, targetPos, movementNoise):
         global debug
-        tileWeight = self._stalking_tile_weight(tile[1])
-        if tile[0] in flowerScentLookup:
-            scentWeigthFlower = flowerScentLookup[tile[0]]
-        else:
-            scentWeigthFlower = 0
-        if tile[0] in predatorScentLookup:
-            scentWeigthPredator = predatorScentLookup[tile[0]] // 2
-        else:
-            scentWeigthPredator = 0
+        tilePos, tileType = tile
+        tileWeight = self._stalking_tile_weight(tileType)
+        scentWeigthFlower = flowerScentLookup.get(tilePos,0)
+        scentWeigthPredator = predatorScentLookup.get(tilePos, 0) // 2
         #movementNoise = random.randint(-5,5)
         if debug:
             movementNoise = 0
-        if tile[0] == targetPos: target = 100
+        if tilePos == targetPos: target = 100
         else: target = 0
-        return (tile[0],  (tileWeight + (scentWeigthFlower - scentWeigthPredator) + movementNoise + target))
+        return (tilePos,  (tileWeight + (scentWeigthFlower - scentWeigthPredator) + movementNoise + target))
     
     def _pursuit_weight(self, tile, predatorScentLookup):
-        tileWeight = self._pursuit_tile_weight(tile[1])
-        if tile[0] in predatorScentLookup:
-            scentWeigthPredator = predatorScentLookup[tile[0]] * 2
-        else:
-            scentWeigthPredator = 0
-
-        return (tile[0],  (tileWeight - scentWeigthPredator))
+        tilePos, tileType = tile
+        tileWeight = self._pursuit_tile_weight(tileType)
+        scentWeigthPredator = predatorScentLookup.get(tilePos, 0) * 2
+        
+        return (tilePos,  (tileWeight - scentWeigthPredator))
         
     def _get_max_weight(self, predator, flower, map, phase):
         searchArea = self.search(self.get_sense() // 2)

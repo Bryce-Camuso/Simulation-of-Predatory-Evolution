@@ -1,7 +1,5 @@
-from Prey import Prey
-import heapq
-import math
-from StaticMap import StaticMap
+from .Prey import Prey
+from .StaticMap import StaticMap
 
 class Bird(Prey):
 

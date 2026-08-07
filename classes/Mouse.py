@@ -1,4 +1,4 @@
-from Prey import Prey
+from .Prey import Prey
 
 class Mouse(Prey):
     # this class is just an interface for the prey class

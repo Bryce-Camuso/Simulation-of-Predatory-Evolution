@@ -64,12 +64,13 @@ class Map:
         expects point list as a list of tuples in the form (x,y)
         '''
         returnArray = []
+        mapScale = self.get_map_limit()
+        mapArray = self._map
         for point in pointList:
-            if (point[0] > self._MAPSCALE or point[1] > self._MAPSCALE) or (point[0] < 0 or point[1] < 0 ):
-                pass
-            else:
-                returnArray.append((point,self._map[point[0]][point[1]]))
-        
+            x,y = point[0], point[1]
+            if (x < mapScale and y < mapScale) and (x > 0 and y > 0 ):
+                returnArray.append((point,mapArray[x][y]))
+                
         return returnArray
     
     def get_map_point(self, point):

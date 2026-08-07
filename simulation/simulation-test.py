@@ -243,7 +243,7 @@ def simulation(predatorType, preyType, map):
     succesfulPredators = []
     kids = []
 
-    retries = 100
+    retries = 500
     try:    
         for count in range(retries):
 
@@ -464,20 +464,8 @@ if __name__ == "__main__":
     if args.output:
         sys.stdout = open(args.output, 'w')
 
-    # optimized_worker = partial(process_data, constant_c=fixed_multiplier)
-
-    # with concurrent.futures.ProcessPoolExecutor() as executor:
-
-    #     futures = [executor.submit(simulation, predatorType, preyType, map) for _ in range(startingPopulation)]
-
-    #     # futures = [executor.submit(greet_user, name, age, city="Chicago") for name, age in users] example for second gen on
-
-    #     for future in concurrent.futures.as_completed(futures):
-    #         result = future.result()
-    #         print('------------------------------------------------------------------------')
-
     simulation(predatorType, preyType, map)
 
-    sys.stdout.close()
-    sys.stdout = sys.__stdout__
+    # sys.stdout.close()
+    # sys.stdout = sys.__stdout__
         

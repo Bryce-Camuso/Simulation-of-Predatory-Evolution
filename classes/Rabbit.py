@@ -1,5 +1,5 @@
-from Prey import Prey
-from StaticMap import StaticMap
+from .Prey import Prey
+from .StaticMap import StaticMap
 
 
 class Rabbit(Prey):
