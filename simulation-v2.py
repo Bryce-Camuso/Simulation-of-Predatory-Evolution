@@ -523,7 +523,7 @@ if __name__ == "__main__":
                 averageNumbOfKids = numOfKidsSum / len(nextGenselcetion) # should be 2 but is derived for above average cases
                 # once a run is compleate calculate second order facters into weighted average for second order.
                 nextGenselcetion['first order'] = (nextGenselcetion['Speed'] + nextGenselcetion['Stealth'] + nextGenselcetion['Stamina'] + nextGenselcetion['Sense']) / 4
-                nextGenselcetion['spoted Convertion'] = nextGenselcetion['spoted'].astype(int)
+                nextGenselcetion['spoted Convertion'] = nextGenselcetion['spoted'].astype(int) # this should be reversed but it is to late for me. This is a note for if a future dev picks this up 
                 # finds the weighted average of these three terms to form a second order tie braker selection
                 maxCycles = nextGenselcetion['cycles'].max()
                 nextGenselcetion['second order'] = (nextGenselcetion['cycles'] / maxCycles) * 0.4 + (nextGenselcetion['energyLeft'] / prey.get_energy_total()) * 0.2 + nextGenselcetion['spoted Convertion'] * 0.4
@@ -661,7 +661,7 @@ if __name__ == "__main__":
                 averageNumbOfKids = numOfKidsSum / len(nextGenselcetion) # should be 2 but is derived for above average cases
                 # once a run is compleate calculate second order facters into weighted average for second order.
                 nextGenselcetion['first order'] = (nextGenselcetion['Speed'] + nextGenselcetion['Stealth'] + nextGenselcetion['Stamina'] + nextGenselcetion['Sense']) / 4
-                nextGenselcetion['spoted Convertion'] = nextGenselcetion['spoted'].astype(int)
+                nextGenselcetion['spoted Convertion'] = nextGenselcetion['spoted'].astype(int) # this should be reversed but it is to late for me. This is a note for if a future dev picks this up 
                 # finds the weighted average of these three terms to form a second order tie braker selection
                 maxCycles = nextGenselcetion['cycles'].max()
                 nextGenselcetion['second order'] = (nextGenselcetion['cycles'] / maxCycles) * 0.4 + (nextGenselcetion['energyLeft'] / prey.get_energy_total()) * 0.2 + nextGenselcetion['spoted Convertion'] * 0.4
@@ -799,7 +799,7 @@ if __name__ == "__main__":
                 averageNumbOfKids = numOfKidsSum / len(nextGenselcetion) # should be 2 but is derived for above average cases
                 # once a run is compleate calculate second order facters into weighted average for second order.
                 nextGenselcetion['first order'] = (nextGenselcetion['Speed'] + nextGenselcetion['Stealth'] + nextGenselcetion['Stamina'] + nextGenselcetion['Sense']) / 4
-                nextGenselcetion['spoted Convertion'] = nextGenselcetion['spoted'].astype(int)
+                nextGenselcetion['spoted Convertion'] = nextGenselcetion['spoted'].astype(int) # this should be reversed but it is to late for me. This is a note for if a future dev picks this up  
                 # finds the weighted average of these three terms to form a second order tie braker selection
                 maxCycles = nextGenselcetion['cycles'].max()
                 nextGenselcetion['second order'] = (nextGenselcetion['cycles'] / maxCycles) * 0.4 + (nextGenselcetion['energyLeft'] / prey.get_energy_total()) * 0.2 + nextGenselcetion['spoted Convertion'] * 0.4
