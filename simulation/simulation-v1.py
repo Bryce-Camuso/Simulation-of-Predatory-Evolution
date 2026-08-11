@@ -1,7 +1,6 @@
 #imports
 import sys
 import random as r
-import math
 import argparse
 import concurrent.futures
 import pandas as pd

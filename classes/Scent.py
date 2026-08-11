@@ -84,61 +84,50 @@ class Scent:
         return percent // 5 - 1
     
     def _get_stealth_percent(self, level, stealthStat):
-        return 100 - (level * 10) - ((stealthStat // 10) * 5)
+        return 100 - (level * 20) - ((stealthStat // 10) * 5)
     
-    def _scent_search_top(self, position, level, stealthStat):
-        #adds current position to array. Recursively searchs positions above itself.
-        if level > 9 or (position[0] < 0 or position[1] < 0) or self._get_stealth_percent(level, stealthStat) <= 0:
-            return []
+    def _left_search(self, x, y, endLevel, stealthStat):
+        returnArray = []
+        getStealth =  self._get_stealth_percent
 
-        returnArray = [(self._get_stealth_percent(level, stealthStat), position)]
-        returnArray.extend(self._scent_search_top((position[0], position[1] + 1), level + 1, stealthStat))
-        return returnArray
-    
-    def _scent_search_right(self, position, level, stealthStat):
-        #adds current position to array. Recursively searchs positions above, to it's right, and under itself.
-        if level > 9 or (position[0] < 0 or position[1] < 0) or self._get_stealth_percent(level, stealthStat) <= 0:
-            return []
-
-        returnArray = [(self._get_stealth_percent(level, stealthStat), position)]
-        returnArray.extend(self._scent_search_top((position[0], position[1] + 1), level + 1, stealthStat))
-        returnArray.extend(self._scent_search_right((position[0] + 1, position[1]), level + 1, stealthStat))
-        returnArray.extend(self._scent_search_bottom((position[0], position[1] - 1), level + 1, stealthStat))
-        return returnArray
-    
-    def _scent_search_bottom(self, position, level, stealthStat):
-        #adds current position to array. Recursively searchs positions under itself.
-        if level > 9 or (position[0] < 0 or position[1] < 0) or self._get_stealth_percent(level, stealthStat) <= 0:
-            return []
-
-        returnArray = [(self._get_stealth_percent(level, stealthStat), position)]
-        returnArray.extend(self._scent_search_bottom((position[0], position[1] - 1), level + 1, stealthStat))
-
+        for i in range(1,endLevel + 1):
+            x += 1
+            if x >= 0 and getStealth(endLevel - i, stealthStat) > 0:
+                if y >= 0:
+                    returnArray.append((getStealth(endLevel - i, stealthStat), (x, y)))
+                for t in range(1, i):
+                    if getStealth((endLevel + t) - i, stealthStat) <= 0:
+                        break
+                    if y + t >= 0:
+                        returnArray.append((getStealth((endLevel + t) - i, stealthStat), (x, y + t)))
+                    if y - t >= 0:
+                        returnArray.append((getStealth((endLevel + t) - i, stealthStat), (x, y - t)))
         return returnArray
 
-    def _scent_search_left(self, position, level, stealthStat):
-        #adds current position to array. Recursively searchs positions above, to it's left, and under itself.
-        if level > 9 or (position[0] < 0 or position[1] < 0) or self._get_stealth_percent(level, stealthStat) <= 0:
-            return []
+    def _right_search(self, x, y, endLevel, stealthStat):
+        returnArray = []
+        getStealth =  self._get_stealth_percent
 
-        returnArray = [(self._get_stealth_percent(level, stealthStat), position)]
-        returnArray.extend(self._scent_search_top((position[0], position[1] + 1), level + 1, stealthStat))
-        returnArray.extend(self._scent_search_left((position[0] - 1, position[1]), level + 1, stealthStat))
-        returnArray.extend(self._scent_search_bottom((position[0], position[1] - 1), level + 1, stealthStat))
-
+        for i in range(1,endLevel):
+            x -= 1
+            if x > 0 and getStealth(endLevel - i, stealthStat) > 0:
+                if y >= 0 :
+                    returnArray.append((getStealth(endLevel - i, stealthStat),(x, y)))
+                for t in range(1, i):
+                    if getStealth((endLevel + t) - i, stealthStat) <= 0:
+                        break
+                    if y + t >= 0:
+                        returnArray.append((getStealth((endLevel + t) - i, stealthStat),(x, y + t)))
+                    if y - t >= 0:
+                        returnArray.append((getStealth((endLevel + t) - i, stealthStat),(x, y - t)))
         return returnArray
     
 
     def _scent_search(self, position, stealthStat):
-        returnArray = []
-        returnArray.append((self._get_stealth_percent(0, stealthStat), position))
-
-        #step 2) grab 4 adjacent neighbours as level 1 scent and then recursively find next level ending at level 19
-        returnArray.extend(self._scent_search_top((position[0], position[1] + 1), 1, stealthStat))
-        returnArray.extend(self._scent_search_right((position[0] + 1, position[1]), 1, stealthStat))
-        returnArray.extend(self._scent_search_bottom((position[0], position[1] - 1), 1, stealthStat))
-        returnArray.extend(self._scent_search_left((position[0] - 1, position[1]), 1, stealthStat))
-
+        x,y = position[0], position[1]
+        endLevel = 5
+        returnArray = self._left_search(x - endLevel,y, endLevel, stealthStat)
+        returnArray.extend(self._right_search(x + endLevel,y, endLevel, stealthStat))
         return returnArray
 
     def _update_scent_vars(self, scentPercent, scentCord):

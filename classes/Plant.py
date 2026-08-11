@@ -1,4 +1,4 @@
-from Scent import Scent
+from .Scent import Scent
 
 
 class Plant:
