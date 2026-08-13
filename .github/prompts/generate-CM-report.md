@@ -54,11 +54,11 @@ Review the repository for evidence of:
 Also inspect, when present:
 
 - README.md
-- docs/
+- documents/
 - .github/
 - .github/workflows/
 - tests/
-- requirements.txt
+- documents/requirements.txt
 - package.json
 - pom.xml
 - Dockerfile
@@ -79,6 +79,7 @@ Possible names include:
 - CONFIGURATION_MANAGEMENT_REPORT.md
 - Configuration_Management_Report.md
 - docs/CONFIGURATION_MANAGEMENT_REPORT.md
+- documents/CM_report.md
 - similar clearly identifiable CM report files
 
 ## If a CM Report already exists
@@ -114,7 +115,7 @@ Do not invent previous revision dates or history. Preserve existing history when
 
 Create:
 
-`docs/CONFIGURATION_MANAGEMENT_REPORT.md`
+`documents/CONFIGURATION_MANAGEMENT_REPORT.md`
 
 unless the repository already uses another obvious location for engineering documentation.
 

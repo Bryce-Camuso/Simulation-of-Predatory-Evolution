@@ -5,54 +5,136 @@
 **Course:** CISC 699
 **Semester:** Summer 2026
 **Repository URL:** [github](https://github.com/Bryce-Camuso/Simulation-of-Predatory-Evolution)
-**Current branch:** To Be Completed
-**Document version:** 0.2
-**Document status:** Draft
-**Last updated:** 2026-08-05
-**Primary test frameworks / artifacts:** None (ad-hoc `tester()` functions inside class modules and simulation drivers)
- 
+**Current branch:** master
+**Current commit SHA:** 92220e7
+**Document version:** 0.3
+**Document status:** Final
+**Last updated:** 2026-08-12
+**Primary test frameworks / artifacts:** Ad-hoc `tester()` functions inside class modules; GitHub Actions CI workflow configured to run class tester scripts.
+**Configuration management report:** `documents/CONFIGURATION_MANAGEMENT_REPORT.md`
+
 ---
 
-# Test execution summary (runs performed 2026-08-05)
+# Test artifacts summary
 
-I ran the in-repo class-level tester scripts located in the `classes/` folder from the repository root using the workspace Python interpreter. Runs were executed synchronously and outputs were captured from the terminal. Below are the observed outcomes and brief evidence notes copied from the captured console output.
+This repository contains developer-written validation artifacts and a CI workflow configuration, but it does not contain a formal Python test suite or committed execution reports.
+
+- `.github/workflows/ci.yml` exists and is configured to run class-level tester modules on `windows-latest` with Python `3.14.4` and `pandas==3.0.3`.
+- `classes/Animal.py`, `classes/Bird.py`, `classes/Map.py`, `classes/Mouse.py`, `classes/Plant.py`, `classes/Predator.py`, `classes/Prey.py`, `classes/Rabbit.py`, and `classes/Scent.py` each define `tester()` and an `if __name__ == '__main__'` entry point.
+- `classes/Mouse.py` currently defines a no-op `tester()` function (`pass`).
+- `classes/StaticMap.py` exists as a dedicated test helper class.
+- `requirements.txt` in the repository is a narrative requirements summary, not a standard dependency manifest.
+- No dated logs, coverage reports, or other test execution artifacts are committed in the repository.
+
+---
+
+## Repository evidence inventory
+
+- `README.md` — project overview, dependency guidance for Python 3.14.4, and pandas installation instructions.
+- `documents/PRD.md` — Product Requirements Document and requirements source.
+- `documents/CONFIGURATION_MANAGEMENT_REPORT.md` — configuration management evidence.
+- `.github/workflows/ci.yml` — CI workflow configured to validate class tester modules.
+- `classes/` modules — production code and inline tester harnesses.
+- `simulation-test.py`, `simulation-v1.py`, `simulation-demo.py`, `simulation-v2.py` — simulation drivers and integration-style entry points.
+- `csv/` directory — present as output data storage, but no committed test output files were observed.
+- `requirements.txt` — narrative project requirements summary, not a pip-style manifest.
+
+---
+
+## Automation and test status
+
+- Test artifact presence: Yes.
+- Formal test framework present: No.
+- Dependency manifest suitable for automation: No.
+- CI configuration present: Yes.
+- Committed test execution results: No.
+
+---
+
+## Test execution summary (runs performed 2026-08-12)
+
+The class-level tester modules were executed using package mode from the repository root:
+
+```bash
+python -m classes.Animal
+python -m classes.Bird
+python -m classes.Map
+python -m classes.Mouse
+python -m classes.Plant
+python -m classes.Predator
+python -m classes.Prey
+python -m classes.Rabbit
+python -m classes.Scent
+```
+
+The outputs captured from the module executions were:
 
 | Artifact run | Outcome | Notes / evidence |
 |--------------|---------|------------------|
-| `classes/Map.py` | PASS | All Map tester checks printed `pass` (Map Size, Tile Distribution, Getters, Singleton).
-| `classes/Scent.py` | PASS | Scent trail get/add/update/decay checks printed `pass` for multiple levels.
-| `classes/Plant.py` | PASS | Getters, setters, and `Update Scent Trail` printed `pass`.
-| `classes/Animal.py` | PASS | Getters/setters, scent update, search, scent decay, energy use, and pathfinding printed `pass`.
-| `classes/Prey.py` | PASS | Getter/setter, move-phase tests, and struggle printed `pass`.
-| `classes/Predator.py` | PARTIAL (1 failure) | Most checks passed; `ambush range` test printed `fail` (see console output in appendix).
-| `classes/Bird.py` | PASS | Getters/setters and `pathfinding check: pass` observed.
-| `classes/Rabbit.py` | PASS | `check_escape: pass` observed.
-
+| `python -m classes.Animal` | PASS | Animal getters/setters, scent update, search, energy use, and pathfinding checks all printed `pass`.
+| `python -m classes.Bird` | PASS | Bird getters/setters and `pathfinding check: pass` were observed.
+| `python -m classes.Map` | PASS | Map size, distribution, getters, and singleton checks all printed `pass`.
+| `python -m classes.Mouse` | PASS | Module imported successfully, but `tester()` is a no-op and produced no validation output.
+| `python -m classes.Plant` | PASS | Plant getters/setters and scent trail update checks all printed `pass`.
+| `python -m classes.Predator` | PASS | Predator getters/setters, move-list, ambush, and reproduction checks all printed `pass`.
+| `python -m classes.Prey` | PASS | Prey getters/setters, move-list, struggle, and escape logic checks all printed `pass`.
+| `python -m classes.Rabbit` | PASS | Rabbit escape check printed `pass`.
+| `python -m classes.Scent` | PASS | Scent trail creation, addition, update, and decay checks all printed `pass`.
 
 Execution notes:
-- All scripts were executed from the repository root using the configured Python executable for the workspace.
-- `classes/Predator.py` produced a failing check for `ambush range` which should be investigated; other Predator tests passed.
-- Two modules (`Mouse.py`, `StaticMap.py`) produced no output; they either lack `tester()` functions or their `__main__` sections do not print results.
-
-Recorded terminal outputs are available in the terminal session. Where tests printed `pass` or `fail`, those strings were captured directly from the modules' tester outputs.
-
----
-
-## Effects on previous status fields
-
-- Execution status for most class-level testers is now `Completed` with captured `pass` outputs as recorded above.
-- `classes/Predator.py` is `Partial` due to one failing check (`ambush range: fail`).
-- `classes/Mouse.py` and `classes/StaticMap.py` produced no tester output and are marked `To Be Completed` (no evidence of tester execution in those modules).
-- `CI/CD status` remains `To Be Completed` (no CI configuration present in the repository).
+- Package execution was required because `classes/` modules use relative imports such as `from .Scent import Scent`.
+- `classes/Mouse.py` remains a placeholder tester with no output.
+- `classes/StaticMap.py` is used as a support helper but is not itself a standalone test module.
+- No committed execution artifacts or reports are present in the repository.
 
 ---
 
-## Minimal next steps to produce fully automated, green test status
+## Notes on available validation harnesses
 
-1. Fix the `StaticMap` test helper (or adjust the `Prey`/`Predator` testers) so their test harnesses use the same Map API as production (`get_map_limit()` exists). This will likely make `Prey` and `Predator` testers run to completion.
-2. Convert in-file testers to `pytest` modules and add a simple GitHub Actions CI workflow to run the test suite and upload artifacts.
+- Each listed class module exposes an ad-hoc `tester()` function that can be run directly.
+- The CI workflow is configured to execute the class tester modules by path.
+- `classes/Mouse.py` contains a placeholder `tester()` and therefore does not implement a meaningful module-level validation check.
+- `classes/StaticMap.py` is a reusable test helper and not itself a formal test case.
+- There is no evidence of `pytest` or `unittest` style test files in the repository.
 
 ---
+
+## How to run available checks locally
+
+From the repository root, run:
+
+```bash
+python classes/Animal.py
+python classes/Bird.py
+python classes/Map.py
+python classes/Mouse.py
+python classes/Plant.py
+python classes/Predator.py
+python classes/Prey.py
+python classes/Rabbit.py
+python classes/Scent.py
+```
+
+Simulation drivers can be executed from the repository root:
+
+```bash
+python simulation-test.py
+python simulation-v1.py
+python simulation-demo.py
+python simulation-v2.py
+```
+
+Note: Some scripts may require repository-root-relative imports or `sys.path` adjustments. Execute them from the repository root to ensure imports resolve.
+
+---
+
+## Known gaps and recommended next steps
+
+1. Convert inline `tester()` functions into a structured `pytest` or `unittest` suite with assert-based test cases.
+2. Replace or supplement the repository narrative `requirements.txt` with a standard dependency manifest such as `requirements.txt` or `pyproject.toml`.
+3. Capture and commit CI or local test execution artifacts, and optionally publish logs or coverage reports as workflow artifacts.
+4. Implement a meaningful `classes/Mouse.py` tester harness.
+5. Add a documented test-results folder and link dated run reports from this document.
 
 ---
 
@@ -60,111 +142,37 @@ Recorded terminal outputs are available in the terminal session. Where tests pri
 
 | Version | Date | Author | Notes |
 |--------:|------|--------|-------|
-| 0.1 | 2026-07-28 | Repository analysis | Initial living test-plan generated from repository evidence (excludes `run_test.bat` and `/test`) |
+| 0.1 | 2026-07-28 | Repository analysis | Initial living test-plan generated from repository evidence. |
+| 0.2 | 2026-08-05 | Draft update | Original draft contained pre-existing assumptions; improved evidence grounding required. |
+| 0.3 | 2026-08-12 | GitHub Copilot | Updated to reflect repository evidence: CI workflow exists, inline testers exist, no committed execution artifacts.
 
 ---
 
 ## Purpose
 
-This Software Test Plan and Report documents the current, repository-grounded testing artifacts and their mapping to requirements in `documents/PRD.md`. No information is invented; unknown items are marked `To Be Completed`.
+This document captures the current repository-grounded software test plan and report for the predator-prey simulation project. It avoids assumptions beyond the committed repository contents.
 
 ---
 
-## Evidence inventory (included in this report)
-
-- [README.md](README.md) — project overview, dependencies (Python 3.14.4) and instructions.
-- [documents/PRD.md](documents/PRD.md) — Product Requirements Document (source of requirement identifiers and descriptions).
-- `classes/` — production code for simulation components. Several class files include inline `tester()` functions (e.g., `classes/Animal.py`, `classes/Scent.py`, `classes/Map.py`, `classes/Predator.py`, `classes/Prey.py`, `classes/Bird.py`, `classes/Rabbit.py`). These are developer-written smoke tests inside class files; presence is recorded, but execution evidence is not in the repo.
-- `simulation-test.py` and `simulation-v1.py` — small simulation drivers that instantiate `Animal` objects and run loops using `Animal.search()` and `Animal.pathfinding()`; useful for integration-style checks.
-- `csv/` directory — present to hold potential output data (no dated test result files were observed).
-- `documents/` folder — houses `PRD.md` and project documentation used to trace requirements.
-
-Excluded from this report by user request: `run_test.bat` and files under the `/test` folder are not discussed or used as evidence here.
-
----
-
-## Mapping artifacts to PRD requirements (conservative)
-
-The following mappings are conservative: they assert that code or drivers exercise the listed requirements, not that automated test results exist or passed.
-
-- `classes/Animal.py` (and related classes): exercises FR-1.1.1, FR-1.2.1, FR-1.3.1, FR-3.x (scent integration), FR-4.3.1 (pathfinding/pursuit behavior).
-- `classes/Scent.py`: exercises FR-3.1.1, FR-3.2.1, FR-3.3.1, FR-3.4.1.
-- `classes/Map.py`: exercises FR-2.1.1, FR-2.2.1, FR-2.3.1.
-- `classes/Prey.py`, `classes/Predator.py`, `classes/Bird.py`, `classes/Rabbit.py`: exercise FR-4.x family (search, stalking, pursuit) and reproductive/evolution behaviors found in class code.
-- `simulation-test.py` / `simulation-v1.py`: exercise FR-7.1.1 and FR-7.2.1 (initialization and simulation loop), and compose multiple subsystems for integration checks.
-
-Execution status for all mappings: To Be Completed (no execution logs, CI, or recorded test artifacts found in the repository for these mappings).
-
----
-
-## Test status summary
-
-- Test artifacts present (inline testers, simulation drivers): Yes.
-- Structured test framework (pytest, unittest) present: No.
-- CI configuration present: No.
-- Historical test run artifacts (logs, coverage reports): No.
-
-All quantitative results (pass/fail counts, coverage percentages, performance metrics) are `To Be Completed`.
-
----
-
-## How to run the available checks locally (evidence-based)
-
-Run individual class-level tester functions (each class file contains a `tester()` function or a `__main__` section). Example commands from repository root:
-
-```bash
-python classes/Animal.py
-python classes/Scent.py
-python classes/Map.py
-python classes/Predator.py
-python classes/Prey.py
-python classes/Bird.py
-python classes/Rabbit.py
-```
-
-Run the simulation driver(s):
-
-```bash
-python simulation-test.py
-python simulation-v1.py
-```
-
-Notes: Some scripts modify `sys.path` before importing `classes/`. Run commands from the repository root to ensure imports resolve.
-
----
-
-## Known gaps and recommended next steps (evidence-driven)
-
-1. Convert inline `tester()` functions and ad-hoc drivers into a structured test suite (recommended: `pytest`) with deterministic assert-based test cases. This enables automated pass/fail reporting and CI integration.
-2. Add a dependency manifest (`requirements.txt` or `pyproject.toml`) to make test and runtime environment reproducible (README references Python 3.14.4 but no manifest file exists).
-3. Add CI (e.g., GitHub Actions workflow) to run tests on push/PR and store artifacts (test logs, coverage reports).
-4. Run `simulation-test.py` and class tester scripts, capture outputs, and commit run artifacts or save them as CI artifacts so the repository reflects execution status.
-5. Add a `docs/test-results/` or `documents/test-report/` location to store dated test reports and add a short summary of each run in `documents/Software Test Plan and Report.md`.
-
----
-
-## Test metrics and results
-
-No executed test metrics or results were found in the repository. All metrics and pass/fail statuses are `To Be Completed` until the tests are executed and artifacts are recorded.
-
----
-
-## Final recommendations (prioritized)
-
-- High: Convert to `pytest` and add CI workflow to run tests and upload artifacts.
-- High: Add `requirements.txt` or `pyproject.toml` and lock Python version in docs.
-- Medium: Run existing simulation drivers and class testers, capture outputs, and commit artifacts or attach them to CI runs.
-- Medium: Add a `documents/test-results/` folder to store structured reports and link them from this document.
-
----
-
-## Appendix — files consulted (excluding `run_test.bat` and `/test`)
+## Appendix — files consulted
 
 - `README.md`
 - `documents/PRD.md`
-- `classes/Animal.py`, `classes/Scent.py`, `classes/Map.py`, `classes/Predator.py`, `classes/Prey.py`, `classes/Bird.py`, `classes/Rabbit.py`
-- `simulation-test.py`, `simulation-v1.py`
-- `csv/` (directory presence)
-
+- `documents/CONFIGURATION_MANAGEMENT_REPORT.md`
+- `.github/workflows/ci.yml`
+- `classes/Animal.py`
+- `classes/Bird.py`
+- `classes/Map.py`
+- `classes/Mouse.py`
+- `classes/Plant.py`
+- `classes/Predator.py`
+- `classes/Prey.py`
+- `classes/Rabbit.py`
+- `classes/Scent.py`
+- `simulation-test.py`
+- `simulation-v1.py`
+- `simulation-demo.py`
+- `simulation-v2.py`
+- `requirements.txt`
 
 <!-- End of Software Test Plan and Report -->

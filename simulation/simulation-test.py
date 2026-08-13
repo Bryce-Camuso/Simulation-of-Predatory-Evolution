@@ -1,14 +1,11 @@
 #imports
 import sys
 import random as r
-import math
 import time
 import traceback
 import argparse
-import concurrent.futures
-from functools import partial
 
-sys.path.append('classes/')
+
 from classes.Predator import Predator
 from classes.Rabbit import Rabbit
 from classes.Bird import Bird
@@ -466,6 +463,6 @@ if __name__ == "__main__":
 
     simulation(predatorType, preyType, map)
 
-    # sys.stdout.close()
-    # sys.stdout = sys.__stdout__
+    sys.stdout.close()
+    sys.stdout = sys.__stdout__
         

@@ -1,11 +1,9 @@
 #imports
-import sys
 import random as r
 import argparse
 import concurrent.futures
 import pandas as pd
 
-sys.path.append('classes/')
 from classes.Predator import Predator
 from classes.Rabbit import Rabbit
 from classes.Bird import Bird
